@@ -1,12 +1,18 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Students from './pages/Students';
 import Rooms from './pages/Rooms';
 import Complaints from './pages/Complaints';
 import Payments from './pages/Payments';
+
+const PrivateRoute = () => {
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+};
 
 const AdminLayout = () => {
   return (
@@ -25,14 +31,17 @@ function App() {
       <Routes>
         {/* Public Landing Page */}
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
 
-        {/* Admin Dashboard Routes */}
-        <Route element={<AdminLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/students" element={<Students />} />
-          <Route path="/rooms" element={<Rooms />} />
-          <Route path="/complaints" element={<Complaints />} />
-          <Route path="/payments" element={<Payments />} />
+        {/* Protected Admin Routes */}
+        <Route element={<PrivateRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/students" element={<Students />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/complaints" element={<Complaints />} />
+            <Route path="/payments" element={<Payments />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

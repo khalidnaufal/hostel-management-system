@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import StudentModal from '../components/StudentModal';
 
 const Students = () => {
     const [students, setStudents] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         fetchStudents();
@@ -17,12 +19,34 @@ const Students = () => {
         }
     };
 
+    const handleAddStudent = async (studentData) => {
+        try {
+            await api.post('/students', studentData);
+            fetchStudents();
+            setIsModalOpen(false);
+        } catch (error) {
+            alert('Error adding student: ' + error.message);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this student?')) {
+            try {
+                await api.delete(`/students/${id}`);
+                fetchStudents();
+            } catch (error) {
+                alert('Error deleting student: ' + error.message);
+            }
+        }
+    };
+
     return (
         <div className="page">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <h2>Students Management</h2>
-                <button className="btn">+ Add Student</button>
+                <button className="btn" onClick={() => setIsModalOpen(true)}>+ Add Student</button>
             </div>
+
             <table>
                 <thead>
                     <tr>
@@ -44,15 +68,27 @@ const Students = () => {
                                 <td>{student.studentId}</td>
                                 <td>{student.email}</td>
                                 <td>{student.phone}</td>
-                                <td>{student.roomNumber || 'Unassigned'}</td>
+                                <td>{student.roomNumber || <span className="badge warning">Unassigned</span>}</td>
                                 <td>
-                                    <button className="btn" style={{ background: '#e74c3c', padding: '5px 10px', fontSize: '0.8rem' }}>Delete</button>
+                                    <button
+                                        className="btn"
+                                        style={{ background: '#ef4444', padding: '6px 12px', fontSize: '0.8rem' }}
+                                        onClick={() => handleDelete(student._id)}
+                                    >
+                                        Delete
+                                    </button>
                                 </td>
                             </tr>
                         ))
                     )}
                 </tbody>
             </table>
+
+            <StudentModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAdd={handleAddStudent}
+            />
         </div>
     );
 };

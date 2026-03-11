@@ -6,8 +6,7 @@ const LandingNavbar = () => {
     const navigate = useNavigate();
 
     const handleLogin = () => {
-        // For now, simulate login by redirecting to dashboard
-        navigate('/dashboard');
+        navigate('/login');
     };
 
     return (
@@ -15,7 +14,7 @@ const LandingNavbar = () => {
             <div className="landing-navbar-left">
                 {/* Placeholder for University Logo */}
                 <div className="logo-placeholder"></div>
-                <span className="university-text">Manipal Academy of Higher Education</span>
+                <span className="university-text">HMS</span>
             </div>
             <div className="landing-navbar-right">
                 <Link to="/">Home</Link>

@@ -14,7 +14,7 @@ const HeroSection = () => {
                     Empowering students with world-class education and opportunities.
                 </p>
                 <div className="hero-buttons">
-                    <button className="primary-btn" onClick={() => navigate('/dashboard')}>Login</button>
+                    <button className="primary-btn" onClick={() => navigate('/login')}>Login</button>
                     <button className="secondary-btn">Contact Us</button>
                 </div>
             </div>
