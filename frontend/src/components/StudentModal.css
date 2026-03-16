@@ -13,12 +13,13 @@
 }
 
 .modal-content {
-    background: white;
+    background: var(--surface);
     width: 100%;
     max-width: 500px;
-    border-radius: 12px;
+    border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
-    animation: modalIn 0.3s ease-out;
+    border: 1px solid var(--border);
+    animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-header {
@@ -71,19 +72,28 @@
     width: 100%;
     padding: 10px 14px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 0.95rem;
     box-sizing: border-box;
+    transition: var(--transition);
+    background-color: var(--background);
 }
 
 .form-group input:focus {
     outline: none;
     border-color: var(--primary);
+    background-color: var(--surface);
+    box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .btn.secondary {
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--background);
+    color: var(--text-muted);
+}
+
+.btn.secondary:hover {
+    background: #E5E7EB;
+    color: var(--text-main);
 }
 
 @keyframes modalIn {

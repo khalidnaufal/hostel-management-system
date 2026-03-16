@@ -59,12 +59,13 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: #d32f2f;
-    box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+    border-color: var(--primary, #4F46E5);
+    background-color: var(--surface, #FFFFFF);
+    box-shadow: 0 0 0 3px var(--primary-light, #EEF2FF);
 }
 
 .error-message {
-    color: #d32f2f;
+    color: #DC2626;
     font-size: 0.85rem;
     font-weight: 500;
     margin-bottom: 16px;
@@ -74,21 +75,21 @@
 .login-submit-btn {
     width: 100%;
     padding: 14px;
-    background-color: #d32f2f;
+    background-color: var(--primary, #4F46E5);
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     margin-top: 10px;
 }
 
 .login-submit-btn:hover {
-    background-color: #b71c1c;
+    background-color: var(--primary-hover, #4338CA);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 .back-home-btn {
@@ -104,7 +105,7 @@
 }
 
 .back-home-btn:hover {
-    color: #d32f2f;
+    color: var(--primary, #4F46E5);
 }
 
 @keyframes fadeIn {

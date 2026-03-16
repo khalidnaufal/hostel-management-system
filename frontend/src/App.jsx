@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar';
+// Removed Navbar import
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -14,14 +14,20 @@ const PrivateRoute = () => {
   return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
 };
 
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+
 const AdminLayout = () => {
   return (
-    <>
-      <Navbar />
-      <div className="container">
-        <Outlet />
+    <div className="admin-layout">
+      <Sidebar />
+      <div className="main-content">
+        <Header />
+        <div className="page-content">
+          <Outlet />
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

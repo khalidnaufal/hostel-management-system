@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { Plus } from 'lucide-react';
 
 const Payments = () => {
     const [payments, setPayments] = useState([]);
@@ -19,38 +20,47 @@ const Payments = () => {
 
     return (
         <div className="page">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="page-header">
                 <h2>Payment History</h2>
-                <button className="btn">+ Record Payment</button>
+                <button className="btn">
+                    <Plus size={18} /> Record Payment
+                </button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Student ID</th>
-                        <th>Amount</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {payments.length === 0 ? (
-                        <tr><td colSpan="4" style={{ textAlign: 'center' }}>No payments recorded</td></tr>
-                    ) : (
-                        payments.map(payment => (
-                            <tr key={payment._id}>
-                                <td>{payment.studentId}</td>
-                                <td>${payment.amount}</td>
-                                <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
-                                <td>
-                                    <span className={`badge ${payment.status === 'Paid' ? 'success' : 'danger'}`}>
-                                        {payment.status}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+            
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {payments.length === 0 ? (
+                            <tr><td colSpan="4" style={{ textAlign: 'center', padding: '32px' }}>No payments recorded</td></tr>
+                        ) : (
+                            payments.map(payment => (
+                                <tr key={payment._id}>
+                                    <td>
+                                        <span className="badge info">{payment.studentId}</span>
+                                    </td>
+                                    <td style={{ fontWeight: 600 }}>${payment.amount}</td>
+                                    <td style={{ color: 'var(--text-muted)' }}>
+                                        {new Date(payment.paymentDate).toLocaleDateString()}
+                                    </td>
+                                    <td>
+                                        <span className={`badge ${payment.status === 'Paid' ? 'success' : 'danger'}`}>
+                                            {payment.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };

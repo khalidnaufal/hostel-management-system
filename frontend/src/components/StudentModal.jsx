@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { X, UserPlus } from 'lucide-react';
 import './StudentModal.css';
 
 const StudentModal = ({ isOpen, onClose, onAdd }) => {
@@ -23,11 +24,15 @@ const StudentModal = ({ isOpen, onClose, onAdd }) => {
     };
 
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h3>Add New Student</h3>
-                    <button className="close-btn" onClick={onClose}>&times;</button>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <UserPlus size={20} color="var(--primary)" /> Add New Student
+                    </h3>
+                    <button className="icon-btn" onClick={onClose} style={{ border: 'none' }}>
+                        <X size={20} />
+                    </button>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="modal-body">

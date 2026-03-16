@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { Users, BedDouble, AlertCircle, CreditCard } from 'lucide-react';
 
 const Dashboard = () => {
     const [stats, setStats] = useState({
@@ -35,24 +36,54 @@ const Dashboard = () => {
 
     return (
         <div className="page">
-            <h2>Admin Dashboard</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '24px', margin: '24px 0' }}>
-                <div className="stat-card pastel-blue">
-                    <h3>Total Students</h3>
-                    <h2>{stats.students}</h2>
+            <div className="page-header">
+                <h2>Dashboard Overview</h2>
+            </div>
+            
+            <div className="dashboard-grid">
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <h3>Total Students</h3>
+                        <h2>{stats.students}</h2>
+                    </div>
+                    <div className="stat-icon" style={{ backgroundColor: '#EEF2FF', color: '#4F46E5' }}>
+                        <Users size={28} />
+                    </div>
                 </div>
-                <div className="stat-card pastel-green">
-                    <h3>Total Rooms</h3>
-                    <h2>{stats.rooms}</h2>
+                
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <h3>Total Rooms</h3>
+                        <h2>{stats.rooms}</h2>
+                    </div>
+                    <div className="stat-icon" style={{ backgroundColor: '#D1FAE5', color: '#10B981' }}>
+                        <BedDouble size={28} />
+                    </div>
                 </div>
-                <div className="stat-card pastel-orange">
-                    <h3>Complaints</h3>
-                    <h2>{stats.complaints}</h2>
+                
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <h3>Complaints</h3>
+                        <h2>{stats.complaints}</h2>
+                    </div>
+                    <div className="stat-icon" style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
+                        <AlertCircle size={28} />
+                    </div>
                 </div>
-                <div className="stat-card pastel-purple">
-                    <h3>Payments</h3>
-                    <h2>{stats.payments}</h2>
+                
+                <div className="stat-card">
+                    <div className="stat-content">
+                        <h3>Payments</h3>
+                        <h2>{stats.payments}</h2>
+                    </div>
+                    <div className="stat-icon" style={{ backgroundColor: '#F3E8FF', color: '#9333EA' }}>
+                        <CreditCard size={28} />
+                    </div>
                 </div>
+            </div>
+            
+            <div className="dashboard-charts">
+                {/* Placeholder for future charts */}
             </div>
         </div>
     );

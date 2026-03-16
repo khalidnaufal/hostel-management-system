@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import StudentModal from '../components/StudentModal';
+import { Plus, Trash2 } from 'lucide-react';
 
 const Students = () => {
     const [students, setStudents] = useState([]);
@@ -42,47 +43,60 @@ const Students = () => {
 
     return (
         <div className="page">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="page-header">
                 <h2>Students Management</h2>
-                <button className="btn" onClick={() => setIsModalOpen(true)}>+ Add Student</button>
+                <button className="btn" onClick={() => setIsModalOpen(true)}>
+                    <Plus size={18} /> Add Student
+                </button>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Student ID</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Room</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {students.length === 0 ? (
-                        <tr><td colSpan="6" style={{ textAlign: 'center' }}>No students found</td></tr>
-                    ) : (
-                        students.map(student => (
-                            <tr key={student._id}>
-                                <td>{student.name}</td>
-                                <td>{student.studentId}</td>
-                                <td>{student.email}</td>
-                                <td>{student.phone}</td>
-                                <td>{student.roomNumber || <span className="badge warning">Unassigned</span>}</td>
-                                <td>
-                                    <button
-                                        className="btn"
-                                        style={{ background: '#ef4444', padding: '6px 12px', fontSize: '0.8rem' }}
-                                        onClick={() => handleDelete(student._id)}
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
+            <div className="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Student ID</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Room</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {students.length === 0 ? (
+                            <tr><td colSpan="6" style={{ textAlign: 'center', padding: '32px' }}>No students found</td></tr>
+                        ) : (
+                            students.map(student => (
+                                <tr key={student._id}>
+                                    <td style={{ fontWeight: 500 }}>{student.name}</td>
+                                    <td>
+                                        <span className="badge info">{student.studentId}</span>
+                                    </td>
+                                    <td style={{ color: 'var(--text-muted)' }}>{student.email}</td>
+                                    <td style={{ color: 'var(--text-muted)' }}>{student.phone}</td>
+                                    <td>
+                                        {student.roomNumber ? (
+                                            <span style={{ fontWeight: 500 }}>{student.roomNumber}</span>
+                                        ) : (
+                                            <span className="badge warning">Unassigned</span>
+                                        )}
+                                    </td>
+                                    <td>
+                                        <button
+                                            className="icon-btn"
+                                            style={{ color: '#EF4444', width: '32px', height: '32px' }}
+                                            onClick={() => handleDelete(student._id)}
+                                            title="Delete Student"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
 
             <StudentModal
                 isOpen={isModalOpen}

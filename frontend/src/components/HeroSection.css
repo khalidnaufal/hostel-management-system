@@ -69,15 +69,15 @@
 }
 
 .primary-btn {
-    background-color: #d32f2f;
+    background-color: var(--primary, #4F46E5);
     color: white;
     border: none;
 }
 
 .primary-btn:hover {
-    background-color: #b71c1c;
+    background-color: var(--primary-hover, #4338CA);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(211, 47, 47, 0.4);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
 }
 
 .secondary-btn {
