@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, UserPlus } from 'lucide-react';
 import './StudentModal.css';
 
@@ -23,11 +24,11 @@ const StudentModal = ({ isOpen, onClose, onAdd }) => {
         setFormData({ name: '', studentId: '', email: '', phone: '', roomNumber: '' });
     };
 
-    return (
+    return createPortal(
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontWeight: 700, color: 'var(--text-main)', fontSize: '1.25rem' }}>
                         <UserPlus size={20} color="var(--primary)" /> Add New Student
                     </h3>
                     <button className="icon-btn" onClick={onClose} style={{ border: 'none' }}>
@@ -59,11 +60,12 @@ const StudentModal = ({ isOpen, onClose, onAdd }) => {
                     </div>
                     <div className="modal-footer">
                         <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
-                        <button type="submit" className="btn primary">Save Student</button>
+                        <button type="submit" className="btn primary" style={{ backgroundColor: 'var(--primary)', color: 'white' }}>Save Student</button>
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

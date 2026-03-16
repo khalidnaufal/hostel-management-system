@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Plus } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import RoomModal from '../components/RoomModal';
 
 const Rooms = () => {
     const [rooms, setRooms] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         fetchRooms();
@@ -18,11 +20,32 @@ const Rooms = () => {
         }
     };
 
+    const handleAddRoom = async (roomData) => {
+        try {
+            await api.post('/rooms', roomData);
+            fetchRooms();
+            setIsModalOpen(false);
+        } catch (error) {
+            alert('Error adding room: ' + (error.response?.data?.message || error.message));
+        }
+    };
+
+    const handleDelete = async (id) => {
+        if (window.confirm('Are you sure you want to delete this room?')) {
+            try {
+                await api.delete(`/rooms/${id}`);
+                fetchRooms();
+            } catch (error) {
+                alert('Error deleting room: ' + (error.response?.data?.message || error.message));
+            }
+        }
+    };
+
     return (
         <div className="page">
             <div className="page-header">
                 <h2>Room Management</h2>
-                <button className="btn">
+                <button className="btn" onClick={() => setIsModalOpen(true)}>
                     <Plus size={18} /> Add Room
                 </button>
             </div>
@@ -35,11 +58,12 @@ const Rooms = () => {
                             <th>Capacity</th>
                             <th>Occupancy</th>
                             <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {rooms.length === 0 ? (
-                            <tr><td colSpan="4" style={{ textAlign: 'center', padding: '32px' }}>No rooms found</td></tr>
+                            <tr><td colSpan="5" style={{ textAlign: 'center', padding: '32px' }}>No rooms found</td></tr>
                         ) : (
                             rooms.map(room => (
                                 <tr key={room._id}>
@@ -51,12 +75,28 @@ const Rooms = () => {
                                             {room.occupancy >= room.capacity ? 'Full' : 'Available'}
                                         </span>
                                     </td>
+                                    <td>
+                                        <button
+                                            className="icon-btn"
+                                            style={{ color: '#EF4444', width: '32px', height: '32px' }}
+                                            onClick={() => handleDelete(room._id)}
+                                            title="Delete Room"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </td>
                                 </tr>
                             ))
                         )}
                     </tbody>
                 </table>
             </div>
+
+            <RoomModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onAdd={handleAddRoom}
+            />
         </div>
     );
 };
