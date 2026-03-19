@@ -1,11 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Phone, BookOpen, Key, Loader2, AlertCircle, Sparkles } from 'lucide-react';
+import { 
+    User, Mail, Phone, BookOpen, Lock, Eye, EyeOff, 
+    ArrowRight, CheckCircle2, AlertCircle, Loader2, Sparkles, AtSign 
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './StudentSignup.css';
 
 const StudentSignup = () => {
-    const [form, setForm] = useState({ fullName: '', studentId: '', email: '', phone: '', course: '', password: '' });
+    const [form, setForm] = useState({ 
+        fullName: '', 
+        email: '', 
+        studentId: '', // Added 📝
+        phone: '', 
+        course: '', 
+        password: '',
+        confirmPassword: ''
+    });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -20,96 +33,224 @@ const StudentSignup = () => {
         e.preventDefault();
         setError('');
         
-        // Final frontend check
-        if (form.password.length < 6) { setError('Password must be 6+ characters'); return; }
+        if (form.password !== form.confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        if (form.password.length < 6) { 
+            setError('Password must be 6+ characters'); 
+            return; 
+        }
 
         setLoading(true);
         try {
-            console.log('Attempting signup for:', form.email);
-            const { user } = await signUp({
-                email:      form.email.trim(),
-                password:   form.password,
-                fullName:   form.fullName.trim(),
-                studentId:  form.studentId.trim(),
-                phone:      form.phone.trim(),
-                course:     form.course.trim(),
-            });
+            const signupData = {
+                email: form.email.trim(),
+                password: form.password,
+                fullName: form.fullName.trim(),
+                studentId: form.studentId.trim(), // Using real studentId 📝
+                phone: form.phone.trim(),
+                course: form.course.trim(),
+            };
 
-            // If we have a user object, we are logged in!
+            const { user } = await signUp(signupData);
+
             if (user) {
-                console.log('Signup success, navigating...');
                 localStorage.setItem('isStudentAuthenticated', 'true');
-                // Use window.location as fallback if navigate is being blocked
                 window.location.href = '/student/dashboard';
             } else {
-                setError('Account created, please check if email confirmation is required.');
+                setError('Registration successful! Please login.');
                 setLoading(false);
             }
         } catch (err) {
-            console.error('Full Signup Error Details:', err);
-            // Translate common errors
-            if (err.message.includes('already registered')) {
-                setError('Email already exists! Please try Logging In.');
-            } else if (err.message.includes('unique constraint')) {
-                setError('Student ID or Username is already taken.');
-            } else {
-                setError(err.message || 'Signup failed. Please check your network.');
-            }
+            console.error('Signup Error:', err);
+            setError(err.message || 'Signup failed. Please try again.');
             setLoading(false);
         }
     };
 
+
+    const features = [
+        "Real-time room status",
+        "Fee payment tracking",
+        "Complaint management",
+        "Daily mess menu",
+        "Notice board"
+    ];
+
     return (
-        <div className="signup-ultra-page">
-            <div className="signup-ultra-card animate-in">
-                <div className="signup-ultra-header">
-                    <div className="ultra-logo"><Sparkles size={16} /> HMS<b>Pro</b></div>
-                    <h2>Join Portal</h2>
-                    <p>Create your profile to access all features.</p>
+        <div className="signup-premium-page">
+            <div className="signup-premium-container animate-in">
+                {/* Left Side - Banner */}
+                <div className="signup-banner">
+                    <div className="banner-grid-pattern"></div>
+                    <div className="banner-content">
+                        <div className="banner-logo-section">
+                            <div className="banner-logo">
+                                <Sparkles size={24} className="logo-icon" />
+                                <span>HMS<b>Pro</b></span>
+                            </div>
+                            <span className="portal-badge">STUDENT PORTAL</span>
+                        </div>
+
+                        <div className="banner-text">
+                            <h1>Your hostel,<br />one app away.</h1>
+                            <p>Register to manage your room, fees, complaints, and stay connected with your hostel community.</p>
+                        </div>
+
+                        <ul className="feature-list">
+                            {features.map((feature, index) => (
+                                <li key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+                                    <CheckCircle2 size={20} className="check-icon" />
+                                    <span>{feature}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="signup-ultra-form">
-                    <div className="ultra-group">
-                        <label><User size={14} /> Full Name</label>
-                        <input name="fullName" placeholder="Rahul Sharma" value={form.fullName} onChange={handleChange} required />
+                {/* Right Side - Form */}
+                <div className="signup-form-section">
+                    <div className="form-header">
+                        <h2>Create Student Account</h2>
+                        <p>Already have an account? <Link to="/login">Sign in</Link></p>
                     </div>
 
-                    <div className="ultra-row">
-                        <div className="ultra-group">
-                            <label><BookOpen size={14} /> ID</label>
-                            <input name="studentId" placeholder="ID" value={form.studentId} onChange={handleChange} required />
-                        </div>
-                        <div className="ultra-group">
-                            <label><BookOpen size={14} /> Course</label>
-                            <input name="course" placeholder="Course" value={form.course} onChange={handleChange} required />
-                        </div>
+                    <div className="status-alert">
+                        <CheckCircle2 size={18} />
+                        <span>Student ID & Email setup active</span>
                     </div>
 
-                    <div className="ultra-group">
-                        <label><Mail size={14} /> Official Email</label>
-                        <input type="email" name="email" placeholder="email@college.edu" value={form.email} onChange={handleChange} required />
-                    </div>
-
-                    <div className="ultra-row">
-                        <div className="ultra-group">
-                            <label><Phone size={14} /> Phone</label>
-                            <input name="phone" placeholder="+91..." value={form.phone} onChange={handleChange} required />
+                    <form onSubmit={handleSubmit} className="premium-form">
+                        <div className="form-group-full">
+                            <label>Full Name</label>
+                            <div className="input-wrapper">
+                                <User size={18} className="input-icon" />
+                                <input 
+                                    name="fullName" 
+                                    placeholder="e.g. Khalid Naufal" 
+                                    value={form.fullName} 
+                                    onChange={handleChange} 
+                                    required 
+                                />
+                            </div>
                         </div>
-                        <div className="ultra-group">
-                            <label><Key size={14} /> Pass</label>
-                            <input type="password" name="password" placeholder="6+ chars" value={form.password} onChange={handleChange} required />
+
+                        <div className="form-group-full">
+                            <label>Email ID</label>
+                            <div className="input-wrapper">
+                                <Mail size={18} className="input-icon" />
+                                <input 
+                                    type="email"
+                                    name="email" 
+                                    placeholder="kh@gmail.com" 
+                                    value={form.email} 
+                                    onChange={handleChange} 
+                                    required 
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    {error && <div className="ultra-error"><AlertCircle size={14} /> {error}</div>}
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>Student ID</label>
+                                <div className="input-wrapper">
+                                    <AtSign size={18} className="input-icon" />
+                                    <input 
+                                        name="studentId" 
+                                        placeholder="e.g. STU101" 
+                                        value={form.studentId} 
+                                        onChange={handleChange} 
+                                        required 
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Phone Number</label>
+                                <div className="input-wrapper">
+                                    <Phone size={18} className="input-icon" />
+                                    <input 
+                                        name="phone" 
+                                        placeholder="1234567899" 
+                                        value={form.phone} 
+                                        onChange={handleChange} 
+                                        required 
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-                    <button type="submit" className="ultra-btn" disabled={loading}>
-                        {loading ? <Loader2 className="spin" size={20} /> : 'Create Account Now →'}
-                    </button>
-                </form>
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>Course / Dept</label>
+                                <div className="input-wrapper">
+                                    <BookOpen size={18} className="input-icon" />
+                                    <input 
+                                        name="course" 
+                                        placeholder="BCA" 
+                                        value={form.course} 
+                                        onChange={handleChange} 
+                                        required 
+                                    />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Password</label>
+                                <div className="input-wrapper">
+                                    <Lock size={18} className="input-icon" />
+                                    <input 
+                                        type={showPassword ? "text" : "password"} 
+                                        name="password" 
+                                        placeholder="••••••••••••" 
+                                        value={form.password} 
+                                        onChange={handleChange} 
+                                        required 
+                                    />
+                                    <button 
+                                        type="button" 
+                                        className="toggle-visibility"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
-                <div className="ultra-footer">
-                    Already a member? <Link to="/login" style={{ fontWeight: 800 }}>Sign In</Link>
+                        <div className="form-group-full">
+                            <label>Confirm Password</label>
+                            <div className="input-wrapper">
+                                <Lock size={18} className="input-icon" />
+                                <input 
+                                    type={showConfirmPassword ? "text" : "password"} 
+                                    name="confirmPassword" 
+                                    placeholder="••••••••••••" 
+                                    value={form.confirmPassword} 
+                                    onChange={handleChange} 
+                                    required 
+                                />
+                                <button 
+                                    type="button" 
+                                    className="toggle-visibility"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                >
+                                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {error && <div className="form-error"><AlertCircle size={16} /> {error}</div>}
+
+                        <button type="submit" className="submit-btn" disabled={loading}>
+                            {loading ? <Loader2 className="spin" size={20} /> : (
+                                <>
+                                    <span>Create Account</span>
+                                    <ArrowRight size={20} />
+                                </>
+                            )}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -117,3 +258,5 @@ const StudentSignup = () => {
 };
 
 export default StudentSignup;
+
+

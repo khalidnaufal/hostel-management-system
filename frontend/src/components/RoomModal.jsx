@@ -4,7 +4,7 @@ import { X, PlusSquare } from 'lucide-react';
 
 const RoomModal = ({ isOpen, onClose, onAdd }) => {
     const [formData, setFormData] = useState({
-        roomNumber: '',
+        room_number: '',
         capacity: 1,
     });
 
@@ -17,7 +17,7 @@ const RoomModal = ({ isOpen, onClose, onAdd }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onAdd(formData);
-        setFormData({ roomNumber: '', capacity: 1 });
+        setFormData({ room_number: '', capacity: 1 });
     };
 
     return createPortal(
@@ -37,13 +37,14 @@ const RoomModal = ({ isOpen, onClose, onAdd }) => {
                             <label>Room Number</label>
                             <input 
                                 type="text" 
-                                name="roomNumber" 
-                                value={formData.roomNumber} 
+                                name="room_number" 
+                                value={formData.room_number} 
                                 onChange={handleChange} 
                                 required 
                                 placeholder="e.g. 101"
                             />
                         </div>
+
                         <div className="form-group">
                             <label>Capacity</label>
                             <input 

@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import StudentModal from '../components/StudentModal';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Home } from 'lucide-react';
 
 const Students = () => {
     const [students, setStudents] = useState([]);
+    const [rooms, setRooms] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         fetchStudents();
+        fetchRooms();
     }, []);
 
     const fetchStudents = async () => {
@@ -17,6 +19,24 @@ const Students = () => {
             setStudents(data);
         } catch (error) {
             console.error('Error fetching students:', error);
+        }
+    };
+
+    const fetchRooms = async () => {
+        try {
+            const { data } = await api.get('/rooms');
+            setRooms(data);
+        } catch (error) {
+            console.error('Error fetching rooms:', error);
+        }
+    };
+
+    const handleRoomUpdate = async (studentId, roomNumber) => {
+        try {
+            await api.put(`/students/${studentId}`, { room_number: roomNumber });
+            fetchStudents(); // Refresh to see changes
+        } catch (error) {
+            alert('Error assigning room: ' + (error.response?.data?.message || error.message));
         }
     };
 
@@ -58,7 +78,7 @@ const Students = () => {
                             <th>Student ID</th>
                             <th>Portal Status</th>
                             <th>Phone</th>
-                            <th>Room</th>
+                            <th>Room Assignment</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -81,11 +101,26 @@ const Students = () => {
                                     </td>
                                     <td style={{ color: 'var(--text-muted)' }}>{student.phone}</td>
                                     <td>
-                                        {student.room_number ? (
-                                            <span style={{ fontWeight: 500 }}>{student.room_number}</span>
-                                        ) : (
-                                            <span className="badge warning">Unassigned</span>
-                                        )}
+                                        <div className="room-selector">
+                                            <Home size={14} style={{ color: student.room_number ? 'var(--primary)' : '#9ca3af' }} />
+                                            <select 
+                                                value={student.room_number || ''}
+                                                onChange={(e) => handleRoomUpdate(student.id, e.target.value)}
+                                                className="room-dropdown"
+                                                title="Assign Room"
+                                            >
+                                                <option value="">Unassigned</option>
+                                                {rooms.map(room => (
+                                                    <option 
+                                                        key={room.id} 
+                                                        value={room.room_number}
+                                                        disabled={room.occupancy >= room.capacity && room.room_number !== student.room_number}
+                                                    >
+                                                        Room {room.room_number} ({room.occupancy}/{room.capacity})
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     </td>
                                     <td>
                                         <button
@@ -114,3 +149,4 @@ const Students = () => {
 };
 
 export default Students;
+

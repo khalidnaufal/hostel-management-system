@@ -8,7 +8,7 @@ const getRooms = async (req, res) => {
         const { data, error } = await supabase
             .from('rooms')
             .select('*')
-            .order('roomNumber', { ascending: true });
+            .order('room_number', { ascending: true });
             
         if (error) throw error;
         res.status(200).json(data);

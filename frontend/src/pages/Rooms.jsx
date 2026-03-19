@@ -67,7 +67,7 @@ const Rooms = () => {
                         ) : (
                             rooms.map(room => (
                                 <tr key={room.id}>
-                                    <td style={{ fontWeight: 500 }}>{room.roomNumber}</td>
+                                    <td style={{ fontWeight: 500 }}>{room.room_number}</td>
                                     <td>{room.capacity}</td>
                                     <td>{room.occupancy}</td>
                                     <td>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Clock, User } from 'lucide-react';
 
 const Complaints = () => {
     const [complaints, setComplaints] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchComplaints();
@@ -18,6 +19,18 @@ const Complaints = () => {
         }
     };
 
+    const handleResolve = async (id) => {
+        try {
+            setLoading(true);
+            await api.put(`/complaints/${id}`, { status: 'Resolved' });
+            await fetchComplaints(); // Refresh list
+        } catch (error) {
+            alert('Error resolving complaint: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="page">
             <div className="page-header">
@@ -28,7 +41,7 @@ const Complaints = () => {
                 <table>
                     <thead>
                         <tr>
-                            <th>Student ID</th>
+                            <th>Student</th>
                             <th>Description</th>
                             <th>Date</th>
                             <th>Status</th>
@@ -42,15 +55,23 @@ const Complaints = () => {
                             complaints.map(complaint => (
                                 <tr key={complaint.id}>
                                     <td>
-                                        <span className="badge info">{complaint.studentId}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyCenter: 'center', color: 'var(--primary)' }}>
+                                                <User size={16} style={{ margin: 'auto' }} />
+                                            </div>
+                                            <span className="badge info" style={{ fontWeight: 700 }}>{complaint.student_id}</span>
+                                        </div>
                                     </td>
-                                    <td style={{ maxWidth: '300px' }}>
-                                        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                    <td style={{ maxWidth: '400px' }}>
+                                        <div style={{ fontWeight: 500, color: 'var(--text-main)' }}>
                                             {complaint.description}
                                         </div>
                                     </td>
                                     <td style={{ color: 'var(--text-muted)' }}>
-                                        {new Date(complaint.created_at).toLocaleDateString()}
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                            <Clock size={14} />
+                                            {new Date(complaint.created_at).toLocaleDateString()}
+                                        </div>
                                     </td>
                                     <td>
                                         <span className={`badge ${complaint.status === 'Resolved' ? 'success' : 'warning'}`}>
@@ -59,7 +80,12 @@ const Complaints = () => {
                                     </td>
                                     <td>
                                         {complaint.status !== 'Resolved' && (
-                                            <button className="btn" style={{ padding: '6px 12px', fontSize: '0.8rem', backgroundColor: '#10B981' }}>
+                                            <button 
+                                                className="btn" 
+                                                onClick={() => handleResolve(complaint.id)}
+                                                disabled={loading}
+                                                style={{ padding: '8px 16px', fontSize: '0.85rem', backgroundColor: '#10B981', color: 'white', borderRadius: 8 }}
+                                            >
                                                 <CheckCircle size={14} /> Resolve
                                             </button>
                                         )}
@@ -75,3 +101,4 @@ const Complaints = () => {
 };
 
 export default Complaints;
+
