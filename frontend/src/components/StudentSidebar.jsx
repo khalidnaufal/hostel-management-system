@@ -4,19 +4,14 @@ import {
     LayoutDashboard, BedDouble, CreditCard, Utensils,
     MessageSquarePlus, Bell, User, LogOut
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
 
 const StudentSidebar = () => {
     const navigate = useNavigate();
-    const { signOut } = useAuth();
 
-    const handleLogout = async () => {
-        try {
-            await signOut();
-            navigate('/login');
-        } catch (err) {
-            console.error('Logout failed:', err);
-        }
+    const handleLogout = () => {
+        localStorage.removeItem('isStudentAuthenticated');
+        localStorage.removeItem('studentPhoto'); // Clear photo too if needed
+        navigate('/login');
     };
 
     const navItems = [

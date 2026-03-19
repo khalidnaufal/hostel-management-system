@@ -56,7 +56,7 @@ const Students = () => {
                         <tr>
                             <th>Name</th>
                             <th>Student ID</th>
-                            <th>Email</th>
+                            <th>Portal Status</th>
                             <th>Phone</th>
                             <th>Room</th>
                             <th>Actions</th>
@@ -68,15 +68,21 @@ const Students = () => {
                         ) : (
                             students.map(student => (
                                 <tr key={student.id}>
-                                    <td style={{ fontWeight: 500 }}>{student.name}</td>
+                                    <td style={{ fontWeight: 500 }}>{student.full_name}</td>
                                     <td>
-                                        <span className="badge info">{student.studentId}</span>
+                                        <span className="badge info">{student.student_id}</span>
                                     </td>
-                                    <td style={{ color: 'var(--text-muted)' }}>{student.email}</td>
+                                    <td>
+                                        {student.auth_user_id ? (
+                                            <span className="badge success">Portal Linked</span>
+                                        ) : (
+                                            <span className="badge warning">Waiting for Signup</span>
+                                        )}
+                                    </td>
                                     <td style={{ color: 'var(--text-muted)' }}>{student.phone}</td>
                                     <td>
-                                        {student.roomNumber ? (
-                                            <span style={{ fontWeight: 500 }}>{student.roomNumber}</span>
+                                        {student.room_number ? (
+                                            <span style={{ fontWeight: 500 }}>{student.room_number}</span>
                                         ) : (
                                             <span className="badge warning">Unassigned</span>
                                         )}

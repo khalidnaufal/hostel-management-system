@@ -8,7 +8,7 @@ const syncRoomOccupancy = async (roomNumber) => {
     const { count, error: countError } = await supabase
         .from('students')
         .select('*', { count: 'exact', head: true })
-        .eq('roomNumber', roomNumber);
+        .eq('room_number', roomNumber);
 
     if (countError) {
         console.error('Error counting students for room:', countError.message);
@@ -19,7 +19,7 @@ const syncRoomOccupancy = async (roomNumber) => {
     await supabase
         .from('rooms')
         .update({ occupancy: count })
-        .eq('roomNumber', roomNumber);
+        .eq('room_number', roomNumber);
 };
 
 // @desc    Get all students
@@ -52,8 +52,8 @@ const createStudent = async (req, res) => {
         if (error) throw error;
 
         // Sync room occupancy if a roomNumber was provided
-        if (req.body.roomNumber) {
-            await syncRoomOccupancy(req.body.roomNumber);
+        if (req.body.room_number) {
+            await syncRoomOccupancy(req.body.room_number);
         }
 
         res.status(201).json(data[0]);
@@ -70,7 +70,7 @@ const updateStudent = async (req, res) => {
         // Get old student data to check if room assignment changed
         const { data: oldData } = await supabase
             .from('students')
-            .select('roomNumber')
+            .select('room_number')
             .eq('id', req.params.id)
             .single();
 
@@ -84,8 +84,8 @@ const updateStudent = async (req, res) => {
         if (!data || data.length === 0) return res.status(404).json({ message: 'Student not found' });
 
         // Sync occupancy for old room and new room if room changed
-        const oldRoom = oldData?.roomNumber;
-        const newRoom = req.body.roomNumber;
+        const oldRoom = oldData?.room_number;
+        const newRoom = req.body.room_number;
         if (oldRoom) await syncRoomOccupancy(oldRoom);
         if (newRoom && newRoom !== oldRoom) await syncRoomOccupancy(newRoom);
 
@@ -110,8 +110,8 @@ const deleteStudent = async (req, res) => {
         if (!data || data.length === 0) return res.status(404).json({ message: 'Student not found' });
 
         // Sync room occupancy if student had a room assigned
-        if (data[0].roomNumber) {
-            await syncRoomOccupancy(data[0].roomNumber);
+        if (data[0].room_number) {
+            await syncRoomOccupancy(data[0].room_number);
         }
 
         res.status(200).json({ message: 'Student removed' });

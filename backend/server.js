@@ -27,19 +27,19 @@ app.use('/api/payments', paymentRoutes);
 // Sync all room occupancies based on current student assignments
 const syncAllRoomOccupancies = async () => {
     try {
-        const { data: rooms } = await supabase.from('rooms').select('roomNumber');
+        const { data: rooms } = await supabase.from('rooms').select('room_number');
         if (!rooms) return;
 
         for (const room of rooms) {
             const { count } = await supabase
                 .from('students')
                 .select('*', { count: 'exact', head: true })
-                .eq('roomNumber', room.roomNumber);
+                .eq('room_number', room.room_number);
 
             await supabase
                 .from('rooms')
                 .update({ occupancy: count || 0 })
-                .eq('roomNumber', room.roomNumber);
+                .eq('room_number', room.room_number);
         }
         console.log('Room occupancies synced successfully.');
     } catch (err) {

@@ -1,220 +1,119 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  Eye, EyeOff, User, IdCard, Mail, Phone, BookOpen,
-  Lock, CheckCircle, AlertCircle, ArrowRight, Loader2
-} from 'lucide-react';
+import { User, Mail, Phone, BookOpen, Key, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './StudentSignup.css';
 
-/* ─── Field config ────────────────────────────────────────────────── */
-const FIELDS = [
-  { id: 'fullName',   label: 'Full Name',           type: 'text',     icon: User,     placeholder: 'e.g. Mohammed Fayaz VP',        half: false },
-  { id: 'studentId',  label: 'Student ID',           type: 'text',     icon: IdCard,   placeholder: 'e.g. ST-2024-001',              half: true  },
-  { id: 'email',      label: 'Email Address',        type: 'email',    icon: Mail,     placeholder: 'e.g. student@college.edu',       half: true  },
-  { id: 'phone',      label: 'Phone Number',         type: 'tel',      icon: Phone,    placeholder: 'e.g. +91 98765 43210',           half: true  },
-  { id: 'course',     label: 'Course / Department',  type: 'text',     icon: BookOpen, placeholder: 'e.g. B.Tech Computer Science',   half: true  },
-  { id: 'password',   label: 'Password',             type: 'password', icon: Lock,     placeholder: 'Minimum 8 characters',           half: true  },
-  { id: 'confirmPwd', label: 'Confirm Password',     type: 'password', icon: Lock,     placeholder: 'Re-enter password',              half: true  },
-];
-
-/* ─── Validation ─────────────────────────────────────────────────── */
-const validate = (form) => {
-  const errs = {};
-  if (!form.fullName.trim())                        errs.fullName   = 'Full name is required';
-  if (!form.studentId.trim())                       errs.studentId  = 'Student ID is required';
-  if (!/^\S+@\S+\.\S+$/.test(form.email))          errs.email      = 'Enter a valid email address';
-  if (!/^\+?[\d\s\-]{7,15}$/.test(form.phone))     errs.phone      = 'Enter a valid phone number';
-  if (!form.course.trim())                          errs.course     = 'Course/Department is required';
-  if (form.password.length < 8)                     errs.password   = 'Password must be at least 8 characters';
-  if (form.password !== form.confirmPwd)            errs.confirmPwd = 'Passwords do not match';
-  return errs;
-};
-
-/* ─── Component ──────────────────────────────────────────────────── */
 const StudentSignup = () => {
-  const navigate  = useNavigate();
-  const { signUp } = useAuth();
+    const [form, setForm] = useState({ fullName: '', studentId: '', email: '', phone: '', course: '', password: '' });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { signUp } = useAuth();
 
-  const [form, setForm] = useState({
-    fullName: '', studentId: '', email: '', phone: '',
-    course: '', password: '', confirmPwd: '',
-  });
-  const [errors,        setErrors]        = useState({});
-  const [showPwd,       setShowPwd]       = useState(false);
-  const [showConfirm,   setShowConfirm]   = useState(false);
-  const [loading,       setLoading]       = useState(false);
-  const [serverError,   setServerError]   = useState('');
-  const [success,       setSuccess]       = useState(false);
+    const handleChange = (e) => { 
+        setForm({ ...form, [e.target.name]: e.target.value }); 
+        if (error) setError(''); 
+    };
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setForm(prev => ({ ...prev, [id]: value }));
-    if (errors[id]) setErrors(prev => ({ ...prev, [id]: '' }));
-    setServerError('');
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+        
+        // Final frontend check
+        if (form.password.length < 6) { setError('Password must be 6+ characters'); return; }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const errs = validate(form);
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+        setLoading(true);
+        try {
+            console.log('Attempting signup for:', form.email);
+            const { user } = await signUp({
+                email:      form.email.trim(),
+                password:   form.password,
+                fullName:   form.fullName.trim(),
+                studentId:  form.studentId.trim(),
+                phone:      form.phone.trim(),
+                course:     form.course.trim(),
+            });
 
-    setLoading(true);
-    try {
-      await signUp({
-        email:     form.email,
-        password:  form.password,
-        fullName:  form.fullName,
-        studentId: form.studentId,
-        phone:     form.phone,
-        course:    form.course,
-      });
-      setSuccess(true);
-      setTimeout(() => navigate('/student/dashboard'), 1800);
-    } catch (err) {
-      setServerError(err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
+            // If we have a user object, we are logged in!
+            if (user) {
+                console.log('Signup success, navigating...');
+                localStorage.setItem('isStudentAuthenticated', 'true');
+                // Use window.location as fallback if navigate is being blocked
+                window.location.href = '/student/dashboard';
+            } else {
+                setError('Account created, please check if email confirmation is required.');
+                setLoading(false);
+            }
+        } catch (err) {
+            console.error('Full Signup Error Details:', err);
+            // Translate common errors
+            if (err.message.includes('already registered')) {
+                setError('Email already exists! Please try Logging In.');
+            } else if (err.message.includes('unique constraint')) {
+                setError('Student ID or Username is already taken.');
+            } else {
+                setError(err.message || 'Signup failed. Please check your network.');
+            }
+            setLoading(false);
+        }
+    };
 
-  /* ── strength bar ── */
-  const pwdStrength = (() => {
-    const p = form.password;
-    let s = 0;
-    if (p.length >= 8)           s++;
-    if (/[A-Z]/.test(p))         s++;
-    if (/[0-9]/.test(p))         s++;
-    if (/[^A-Za-z0-9]/.test(p)) s++;
-    return s; // 0-4
-  })();
-  const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'];
-  const strengthColor = ['', '#EF4444', '#F59E0B', '#10B981', '#4F46E5'];
-
-  return (
-    <div className="signup-bg">
-      {/* Animated blobs */}
-      <div className="blob blob-1" />
-      <div className="blob blob-2" />
-      <div className="blob blob-3" />
-
-      <div className="signup-wrapper">
-        {/* ─ Left panel ─ */}
-        <div className="signup-left">
-          <div className="signup-logo">
-            <span className="logo-text">HMS<span className="logo-accent">Pro</span></span>
-            <span className="logo-badge">Student Portal</span>
-          </div>
-          <h1 className="signup-hero-title">
-            Your hostel,<br />
-            <span className="signup-hero-accent">one app away.</span>
-          </h1>
-          <p className="signup-hero-sub">
-            Register to manage your room, fees, complaints, and stay connected with your hostel community.
-          </p>
-          <ul className="signup-features">
-            {['Real-time room status', 'Fee payment tracking', 'Complaint management', 'Daily mess menu', 'Notice board'].map(f => (
-              <li key={f}><CheckCircle size={16} className="feat-icon" />{f}</li>
-            ))}
-          </ul>
-        </div>
-
-        {/* ─ Right panel: form card ─ */}
-        <div className="signup-card">
-          {success ? (
-            <div className="success-screen">
-              <div className="success-icon-wrap">
-                <CheckCircle size={52} color="#10B981" />
-              </div>
-              <h2>Account Created!</h2>
-              <p>Welcome aboard. Redirecting you to your dashboard…</p>
-              <div className="success-loader"><Loader2 size={20} className="spin" /></div>
-            </div>
-          ) : (
-            <>
-              <div className="signup-card-header">
-                <h2>Create Student Account</h2>
-                <p>Already have an account? <Link to="/login" className="signin-link">Sign in</Link></p>
-              </div>
-
-              {serverError && (
-                <div className="alert alert-error">
-                  <AlertCircle size={16} />
-                  <span>{serverError}</span>
+    return (
+        <div className="signup-ultra-page">
+            <div className="signup-ultra-card animate-in">
+                <div className="signup-ultra-header">
+                    <div className="ultra-logo"><Sparkles size={16} /> HMS<b>Pro</b></div>
+                    <h2>Join Portal</h2>
+                    <p>Create your profile to access all features.</p>
                 </div>
-              )}
 
-              <form onSubmit={handleSubmit} noValidate className="signup-form">
-                <div className="form-grid">
-                  {FIELDS.map(({ id, label, type, icon: Icon, placeholder, half }) => {
-                    const isPwd     = id === 'password';
-                    const isConfirm = id === 'confirmPwd';
-                    const showTgl   = isPwd ? showPwd : showConfirm;
-                    const setTgl    = isPwd ? setShowPwd : setShowConfirm;
-                    const inputType = (isPwd || isConfirm)
-                      ? (showTgl ? 'text' : 'password')
-                      : type;
+                <form onSubmit={handleSubmit} className="signup-ultra-form">
+                    <div className="ultra-group">
+                        <label><User size={14} /> Full Name</label>
+                        <input name="fullName" placeholder="Rahul Sharma" value={form.fullName} onChange={handleChange} required />
+                    </div>
 
-                    return (
-                      <div key={id} className={`sf-group ${half ? 'half' : 'full'} ${errors[id] ? 'has-error' : ''}`}>
-                        <label htmlFor={id}>{label}</label>
-                        <div className="sf-input-wrap">
-                          <Icon size={16} className="sf-icon" />
-                          <input
-                            id={id}
-                            type={inputType}
-                            placeholder={placeholder}
-                            value={form[id]}
-                            onChange={handleChange}
-                            autoComplete="off"
-                          />
-                          {(isPwd || isConfirm) && (
-                            <button type="button" className="eye-btn" onClick={() => setTgl(p => !p)}>
-                              {showTgl ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                          )}
+                    <div className="ultra-row">
+                        <div className="ultra-group">
+                            <label><BookOpen size={14} /> ID</label>
+                            <input name="studentId" placeholder="ID" value={form.studentId} onChange={handleChange} required />
                         </div>
-                        {errors[id] && <span className="field-error">{errors[id]}</span>}
+                        <div className="ultra-group">
+                            <label><BookOpen size={14} /> Course</label>
+                            <input name="course" placeholder="Course" value={form.course} onChange={handleChange} required />
+                        </div>
+                    </div>
 
-                        {/* strength bar only for password */}
-                        {isPwd && form.password && (
-                          <div className="strength-wrap">
-                            <div className="strength-bar">
-                              {[1,2,3,4].map(n => (
-                                <div
-                                  key={n}
-                                  className="strength-seg"
-                                  style={{ background: n <= pwdStrength ? strengthColor[pwdStrength] : '#E5E7EB' }}
-                                />
-                              ))}
-                            </div>
-                            <span className="strength-label" style={{ color: strengthColor[pwdStrength] }}>
-                              {strengthLabel[pwdStrength]}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                    <div className="ultra-group">
+                        <label><Mail size={14} /> Official Email</label>
+                        <input type="email" name="email" placeholder="email@college.edu" value={form.email} onChange={handleChange} required />
+                    </div>
+
+                    <div className="ultra-row">
+                        <div className="ultra-group">
+                            <label><Phone size={14} /> Phone</label>
+                            <input name="phone" placeholder="+91..." value={form.phone} onChange={handleChange} required />
+                        </div>
+                        <div className="ultra-group">
+                            <label><Key size={14} /> Pass</label>
+                            <input type="password" name="password" placeholder="6+ chars" value={form.password} onChange={handleChange} required />
+                        </div>
+                    </div>
+
+                    {error && <div className="ultra-error"><AlertCircle size={14} /> {error}</div>}
+
+                    <button type="submit" className="ultra-btn" disabled={loading}>
+                        {loading ? <Loader2 className="spin" size={20} /> : 'Create Account Now →'}
+                    </button>
+                </form>
+
+                <div className="ultra-footer">
+                    Already a member? <Link to="/login" style={{ fontWeight: 800 }}>Sign In</Link>
                 </div>
-
-                <button type="submit" className="signup-submit" disabled={loading}>
-                  {loading
-                    ? <><Loader2 size={18} className="spin" /> Creating Account…</>
-                    : <><span>Create Account</span><ArrowRight size={18} /></>
-                  }
-                </button>
-
-                <p className="terms-note">
-                  By registering, you agree to the hostel's terms and conditions.
-                </p>
-              </form>
-            </>
-          )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default StudentSignup;

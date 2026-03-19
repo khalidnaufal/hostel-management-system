@@ -5,11 +5,11 @@ import './StudentModal.css';
 
 const StudentModal = ({ isOpen, onClose, onAdd }) => {
     const [formData, setFormData] = useState({
-        name: '',
-        studentId: '',
-        email: '',
+        full_name: '',
+        studentId: `ST-${Math.floor(1000 + Math.random() * 9000)}`,
+        username: '',
         phone: '',
-        roomNumber: ''
+        room_number: ''
     });
 
     if (!isOpen) return null;
@@ -21,7 +21,13 @@ const StudentModal = ({ isOpen, onClose, onAdd }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onAdd(formData);
-        setFormData({ name: '', studentId: '', email: '', phone: '', roomNumber: '' });
+        setFormData({ 
+            full_name: '', 
+            studentId: `ST-${Math.floor(1000 + Math.random() * 9000)}`, 
+            username: '', 
+            phone: '', 
+            room_number: '' 
+        });
     };
 
     return createPortal(
@@ -39,15 +45,15 @@ const StudentModal = ({ isOpen, onClose, onAdd }) => {
                     <div className="modal-body">
                         <div className="form-group">
                             <label>Full Name</label>
-                            <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+                            <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} required />
                         </div>
                         <div className="form-group">
                             <label>Student ID</label>
                             <input type="text" name="studentId" value={formData.studentId} onChange={handleChange} required />
                         </div>
                         <div className="form-group">
-                            <label>Email Address</label>
-                            <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+                            <label>Username</label>
+                            <input type="text" name="username" value={formData.username} onChange={handleChange} required />
                         </div>
                         <div className="form-group">
                             <label>Phone Number</label>
@@ -55,7 +61,7 @@ const StudentModal = ({ isOpen, onClose, onAdd }) => {
                         </div>
                         <div className="form-group">
                             <label>Room Number (Optional)</label>
-                            <input type="text" name="roomNumber" value={formData.roomNumber} onChange={handleChange} />
+                            <input type="text" name="room_number" value={formData.room_number} onChange={handleChange} />
                         </div>
                     </div>
                     <div className="modal-footer">

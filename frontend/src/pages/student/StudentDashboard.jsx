@@ -1,12 +1,12 @@
 import React from 'react';
-import { BedDouble, CreditCard, MessageSquarePlus, Bell } from 'lucide-react';
+import { BedDouble, CreditCard, MessageSquarePlus, Bell, User, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const StatCard = ({ icon, label, value, color, bg }) => (
     <div className="stat-card">
         <div className="stat-content">
-            <h3>{label}</h3>
-            <h2 style={{ fontSize: '1.75rem' }}>{value}</h2>
+            <h3 style={{ fontSize: '0.8rem', color: '#64748B' }}>{label}</h3>
+            <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{value}</h2>
         </div>
         <div className="stat-icon" style={{ backgroundColor: bg, color }}>
             {icon}
@@ -15,84 +15,98 @@ const StatCard = ({ icon, label, value, color, bg }) => (
 );
 
 const StudentDashboard = () => {
-    const { student, authUser } = useAuth();
+    const { student, authUser, loading } = useAuth();
     
-    // Fallbacks for display
-    const displayName = student?.full_name || authUser?.user_metadata?.full_name || 'Student';
-    const studentId  = student?.student_id || 'ST-XXXX-XXX';
-    const roomNumber = student?.room_number || 'N/A';
-    const feeStatus  = student?.fee_status || 'Pending';
+    // ⚡ IMPROVEMENT: If we have an authUser, we show the dashboard!
+    // We only show the full loader if we literally have NO user at all yet.
+    if (loading && !authUser) return (
+        <div className="page" style={{ height: '70vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Loader2 className="spin" size={32} color="var(--primary)" />
+        </div>
+    );
+
+    // Dynamic data with fail-safes (uses metadata if DB hasn't finished)
+    const displayName = student?.full_name || authUser?.user_metadata?.full_name || 'HMS Student';
+    const displayId   = student?.student_id || 'ID Pending...';
+    const displayRoom = student?.room_number || 'Not Assigned';
+    const displayFee  = student?.fee_status || 'Pending';
 
     return (
-        <div className="page">
+        <div className="page animate-in">
             <div className="page-header">
                 <div>
-                    <h2>Welcome back, {displayName.split(' ')[0]} 👋</h2>
-                    <p style={{ color: 'var(--text-muted)', margin: 0, marginTop: 4 }}>
-                        Here's a quick overview of your hostel status
-                    </p>
+                    <h2 style={{ fontSize: '1.6rem', fontWeight: 900 }}>Hello, {displayName.split(' ')[0]} 👋</h2>
+                    <p style={{ color: 'var(--text-muted)', margin: '4px 0 0', fontSize: '0.9rem' }}>Welcome to your premium student hostel portal.</p>
                 </div>
-                <span className="badge info" style={{ fontSize: '0.85rem', padding: '8px 16px', borderRadius: '10px' }}>
-                    Student ID: {studentId}
-                </span>
+                <div className="badge info" style={{ padding: '8px 16px', fontSize: '0.8rem', fontWeight: 700 }}>
+                    ID: {displayId}
+                </div>
             </div>
 
-            <div className="dashboard-grid">
+            <div className="dashboard-grid" style={{ gap: 20 }}>
                 <StatCard
-                    icon={<BedDouble size={26} />}
+                    icon={<BedDouble size={22} />}
                     label="My Room"
-                    value={roomNumber !== 'N/A' ? `Room ${roomNumber}` : 'Not Assigned'}
+                    value={displayRoom === 'Not Assigned' ? 'Room TBA' : `Room ${displayRoom}`}
                     color="#4F46E5"
                     bg="#EEF2FF"
                 />
                 <StatCard
-                    icon={<CreditCard size={26} />}
+                    icon={<CreditCard size={22} />}
                     label="Fee Status"
-                    value={feeStatus === 'Paid' ? 'Paid' : 'Pending'}
-                    color={feeStatus === 'Paid' ? '#065F46' : '#92400E'}
-                    bg={feeStatus === 'Paid' ? '#D1FAE5' : '#FEF3C7'}
+                    value={displayFee}
+                    color={displayFee === 'Paid' ? '#059669' : '#D97706'}
+                    bg={displayFee === 'Paid' ? '#ECFDF5' : '#FFFBEB'}
                 />
                 <StatCard
-                    icon={<MessageSquarePlus size={26} />}
+                    icon={<MessageSquarePlus size={22} />}
                     label="Active Complaints"
-                    value={0} // Mocked for now, can be linked to a complaints table count later
+                    value="0"
                     color="#DC2626"
-                    bg="#FEE2E2"
+                    bg="#FEF2F2"
                 />
                 <StatCard
-                    icon={<Bell size={26} />}
-                    label="New Notices"
-                    value={3} // Mocked
+                    icon={<Bell size={22} />}
+                    label="Hostel Notices"
+                    value="3"
                     color="#D97706"
-                    bg="#FEF3C7"
+                    bg="#FFFBEB"
                 />
             </div>
 
-            {/* Recent Activity */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24 }}>
-                {/* Recent Notices */}
-                <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-lg)', padding: 24, border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
-                    <h3 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 700 }}>📢 Latest Notices</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 20 }}>
+                {/* Notices Card */}
+                <div style={{ background: '#fff', borderRadius: '16px', padding: 24, border: '1px solid #E2E8F0', boxShadow: 'var(--shadow-sm)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                        <Bell size={18} color="var(--primary)" />
+                        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>Recent Announcements</h3>
+                    </div>
                     {[
-                        { title: 'Hostel Day Celebration', date: 'Mar 20', tag: 'Event' },
-                        { title: 'Water Supply Maintenance', date: 'Mar 18', tag: 'Maintenance' },
-                        { title: 'Fee Last Date Reminder', date: 'Mar 17', tag: 'Fee' },
+                        { title: 'New Laundry Policy', date: 'Mar 18' },
+                        { title: 'Late Entry Permission', date: 'Mar 17' },
+                        { title: 'Weekly Mess Change', date: 'Mar 15' },
                     ].map((n, i) => (
-                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: i < 2 ? '1px solid var(--border)' : 'none' }}>
-                            <div>
-                                <p style={{ margin: 0, fontWeight: 500, fontSize: '0.9rem' }}>{n.title}</p>
-                                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>{n.date}</p>
-                            </div>
-                            <span className="badge info" style={{ fontSize: '0.7rem' }}>{n.tag}</span>
+                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: i < 2 ? '1px solid #F1F5F9' : 'none' }}>
+                            <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 500 }}>{n.title}</p>
+                            <span style={{ fontSize: '0.75rem', color: '#94A3B8' }}>{n.date}</span>
                         </div>
                     ))}
                 </div>
 
-                {/* My Complaints */}
-                <div style={{ background: 'var(--surface)', borderRadius: 'var(--radius-lg)', padding: 24, border: '1px solid var(--border)', boxShadow: 'var(--shadow-sm)' }}>
-                    <h3 style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 700 }}>📝 Recent Complaints</h3>
-                    <div style={{ textAlign: 'center', padding: '20px 0', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                        No active complaints. Great!
+                {/* Profile Card Summary */}
+                <div style={{ background: '#fff', borderRadius: '16px', padding: 24, border: '1px solid #E2E8F0', boxShadow: 'var(--shadow-sm)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+                        <User size={18} color="var(--primary)" />
+                        <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>Quick Profile</h3>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                        <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
+                            {displayName[0]}
+                        </div>
+                        <div>
+                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700 }}>{displayName}</p>
+                            <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>{student?.course || authUser?.email || 'Student Account'}</p>
+                        </div>
                     </div>
                 </div>
             </div>

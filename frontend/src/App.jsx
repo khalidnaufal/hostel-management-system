@@ -35,9 +35,14 @@ const PrivateRoute = () => {
 const StudentPrivateRoute = () => {
   const { authUser, loading } = useAuth();
   
-  if (loading) return (
-    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F3F4F6' }}>
-      <div style={{ width: 40, height: 40, border: '3px solid #E5E7EB', borderTopColor: '#4F46E5', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+  // ⚡ IMPROVEMENT: If we have an authUser, let them in IMMEDIATELY.
+  // We only show the full-screen loader if we really have no idea who the user is yet.
+  if (loading && !authUser) return (
+    <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#F8FAFC' }}>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ width: 40, height: 40, border: '3px solid #E5E7EB', borderTopColor: '#4F46E5', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
+        <p style={{ color: '#64748B', fontSize: '0.85rem', fontWeight: 600 }}>Authenticating Student Hub...</p>
+      </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
@@ -60,6 +65,17 @@ const AdminLayout = () => (
 
 const StudentLayout = () => {
   const { student, authUser } = useAuth();
+  const [photo, setPhoto] = React.useState(() => localStorage.getItem('studentPhoto') || null);
+
+  React.useEffect(() => {
+    const syncPhoto = () => setPhoto(localStorage.getItem('studentPhoto') || null);
+    window.addEventListener('storage', syncPhoto);
+    return () => window.removeEventListener('storage', syncPhoto);
+  }, []);
+
+  // Use metadata as fallback if the DB row hasn't arrived yet
+  const studentName = student?.full_name || authUser?.user_metadata?.full_name || 'HMS Student';
+  const studentId   = student?.student_id || 'ID Pending';
 
   return (
     <div className="admin-layout">
@@ -79,16 +95,18 @@ const StudentLayout = () => {
         }}>
           <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Student Portal</h2>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.9rem' }}>
-              {(student?.full_name || authUser?.user_metadata?.full_name || 'S')[0]}
-            </div>
-            <div>
-              <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>
-                {student?.full_name || authUser?.user_metadata?.full_name || 'Student'}
-              </p>
-              <p style={{ margin: 0, fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                {student?.student_id || 'HMS Student'} · Room {student?.room_number || 'N/A'}
-              </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {photo ? (
+                <img src={photo} alt="P" style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '0.9rem' }}>
+                    {studentName[0]}
+                </div>
+                )}
+                <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700 }}>{studentName}</p>
+                <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--text-muted)' }}>{studentId}</p>
+                </div>
             </div>
           </div>
         </div>
@@ -111,7 +129,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/student/signup" element={<StudentSignup />} />
 
-          {/* Admin Protected (Legacy local storage auth) */}
+          {/* Admin Protected */}
           <Route element={<PrivateRoute />}>
             <Route element={<AdminLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -122,7 +140,7 @@ function App() {
             </Route>
           </Route>
 
-          {/* Student Protected (Supabase Auth) */}
+          {/* Student Protected */}
           <Route element={<StudentPrivateRoute />}>
             <Route element={<StudentLayout />}>
               <Route path="/student/dashboard" element={<StudentDashboard />} />
@@ -134,6 +152,9 @@ function App() {
               <Route path="/student/profile" element={<MyProfile />} />
             </Route>
           </Route>
+
+          {/* Redirect unknown routes */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
     </AuthProvider>
