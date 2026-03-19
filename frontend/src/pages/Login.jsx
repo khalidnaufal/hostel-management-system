@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import Aurora from '../components/Aurora';
 import './Login.css';
 
 const Login = () => {
@@ -39,7 +40,9 @@ const Login = () => {
         try {
             await signIn({ email: identifier.trim(), password: password.trim() });
             localStorage.setItem('isStudentAuthenticated', 'true');
+            sessionStorage.removeItem('splashShown'); // ⚡ Force splash on next mount
             navigate('/student/dashboard');
+
         } catch (err) {
             setError(err.message || 'Invalid email or password. Please try again.');
         } finally {
@@ -51,7 +54,14 @@ const Login = () => {
 
     return (
         <div className="login-container">
+            <Aurora
+                colorStops={["#FFFFFF", "#87CEEB", "#FFFFFF"]}
+                blend={0.5}
+                amplitude={1.0}
+                speed={0.5}
+            />
             <div className="login-card">
+
                 <h2 className="login-title">HMS<span style={{ color: 'var(--primary)' }}>Pro</span></h2>
                 <p className="login-subtitle">Hostel Management System</p>
 

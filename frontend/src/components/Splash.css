@@ -1,0 +1,50 @@
+.splash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #020617; /* Slate 950 for deep premium feel ⚡ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999; /* Higher priority */
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.splash-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.splash-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.splash-text-giant {
+    font-size: clamp(3.5rem, 8vw, 7rem); /* Responsive giant text */
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 30px rgba(14, 165, 233, 0.4));
+}
+
+.splash-subtext {
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+.subtext-line {
+    opacity: 0.7;
+}
+

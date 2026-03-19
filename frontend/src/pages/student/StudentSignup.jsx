@@ -5,6 +5,7 @@ import {
     ArrowRight, CheckCircle2, AlertCircle, Loader2, Sparkles, AtSign 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import Aurora from '../../components/Aurora';
 import './StudentSignup.css';
 
 const StudentSignup = () => {
@@ -81,7 +82,14 @@ const StudentSignup = () => {
 
     return (
         <div className="signup-premium-page">
+            <Aurora
+                colorStops={["#FFFFFF", "#87CEEB", "#FFFFFF"]}
+                blend={0.5}
+                amplitude={1.0}
+                speed={0.5}
+            />
             <div className="signup-premium-container animate-in">
+
                 {/* Left Side - Banner */}
                 <div className="signup-banner">
                     <div className="banner-grid-pattern"></div>

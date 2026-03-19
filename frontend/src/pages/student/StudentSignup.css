@@ -3,21 +3,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #111827; /* Deep navy background */
+    background: #050b1a; /* Deeper dark background for better aurora visibility */
     padding: 20px;
     font-family: 'Inter', -apple-system, sans-serif;
+    position: relative;
+    overflow: hidden;
 }
 
 .signup-premium-container {
     width: 100%;
-    max-width: 900px; /* Reduced from 1100px */
+    max-width: 900px;
     background: #fff;
-    border-radius: 24px; /* Reduced from 32px */
+    border-radius: 24px;
     display: flex;
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    min-height: 580px; /* Reduced from 700px */
+    box-shadow: 0 40px 80px -12px rgba(0, 0, 0, 0.6);
+    min-height: 580px;
+    position: relative;
+    z-index: 10;
 }
+
 
 /* --- Banner Side --- */
 .signup-banner {

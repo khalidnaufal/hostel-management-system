@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BedDouble, CreditCard, MessageSquarePlus, Bell, User, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import Splash from '../../components/Splash';
+
 
 const StatCard = ({ icon, label, value, color, bg }) => (
     <div className="stat-card">
@@ -16,7 +18,17 @@ const StatCard = ({ icon, label, value, color, bg }) => (
 
 const StudentDashboard = () => {
     const { student, authUser, loading } = useAuth();
+    const [showSplash, setShowSplash] = useState(() => {
+        // Only show if it's the first time in this session
+        return !sessionStorage.getItem('splashShown');
+    });
     
+    // Handle splash completion
+    const handleSplashComplete = () => {
+        setShowSplash(false);
+        sessionStorage.setItem('splashShown', 'true');
+    };
+
     // ⚡ IMPROVEMENT: If we have an authUser, we show the dashboard!
     // We only show the full loader if we literally have NO user at all yet.
     if (loading && !authUser) return (
@@ -25,19 +37,28 @@ const StudentDashboard = () => {
         </div>
     );
 
-    // Dynamic data with fail-safes (uses metadata if DB hasn't finished)
     const displayName = student?.full_name || authUser?.user_metadata?.full_name || 'HMS Student';
     const displayId   = student?.student_id || 'ID Pending...';
     const displayRoom = student?.room_number || 'Not Assigned';
     const displayFee  = student?.fee_status || 'Pending';
+    const firstName   = displayName.split(' ')[0];
+
+    // Show Splash Screen first
+    if (showSplash) {
+        return <Splash name={firstName} onComplete={handleSplashComplete} />;
+    }
 
     return (
         <div className="page animate-in">
             <div className="page-header">
                 <div>
-                    <h2 style={{ fontSize: '1.6rem', fontWeight: 900 }}>Hello, {displayName.split(' ')[0]} 👋</h2>
-                    <p style={{ color: 'var(--text-muted)', margin: '4px 0 0', fontSize: '0.9rem' }}>Welcome to your premium student hostel portal.</p>
+                    <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: 4 }}>
+                        Hello, {firstName}! 👋
+                    </h2>
+                    <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem' }}>Welcome to your premium student hostel portal.</p>
                 </div>
+
+
                 <div className="badge info" style={{ padding: '8px 16px', fontSize: '0.8rem', fontWeight: 700 }}>
                     ID: {displayId}
                 </div>
