@@ -53,32 +53,39 @@ const StudentPrivateRoute = () => {
 };
 
 // ─── Layouts ────────────────────────────────────────────────────
-const AdminLayout = () => (
-  <div className="admin-layout">
-    <Sidebar />
-    <div className="main-content">
-      <Header />
-      <div className="page-content">
-        <Outlet />
+const AdminLayout = () => {
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  
+  return (
+    <div className="admin-layout">
+      {sidebarOpen && <div className="sidebar-overlay open" onClick={() => setSidebarOpen(false)}></div>}
+      <div className={`sidebar-container ${sidebarOpen ? 'open' : ''}`} style={sidebarOpen ? {position: 'fixed', zIndex: 1000} : {}}>
+          <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      </div>
+      <div className="main-content">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
+        <div className="page-content">
+          <Outlet />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const StudentLayout = () => {
   const { student, authUser } = useAuth();
   const [photo, setPhoto] = React.useState(null);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   React.useEffect(() => {
-    // ⚡ SYNC: Load photo from DB if available
-    if (student?.avatar_url) setPhoto(student.avatar_url);
-    
-    const syncPhoto = () => {
-      if (student?.avatar_url) setPhoto(student.avatar_url);
-      else setPhoto(localStorage.getItem('studentPhoto'));
-    };
-    window.addEventListener('storage', syncPhoto);
-    return () => window.removeEventListener('storage', syncPhoto);
+    // ⚡ SYNC: Load photo from DB if available, otherwise hit student-specific cache
+    if (student?.avatar_url) {
+      setPhoto(student.avatar_url);
+    } else if (student?.student_id) {
+      setPhoto(localStorage.getItem(`studentPhoto_${student.student_id}`));
+    } else {
+      setPhoto(null);
+    }
   }, [student]);
 
   // Use metadata as fallback if the DB row hasn't arrived yet
@@ -87,9 +94,12 @@ const StudentLayout = () => {
 
   return (
     <div className="admin-layout">
-      <StudentSidebar />
+      {sidebarOpen && <div className="sidebar-overlay open" onClick={() => setSidebarOpen(false)}></div>}
+      <div className={`sidebar-container ${sidebarOpen ? 'open' : ''}`} style={sidebarOpen ? {position: 'fixed', zIndex: 1000} : {}}>
+          <StudentSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      </div>
       <div className="main-content">
-        <div style={{
+        <div className="student-top-bar" style={{
           height: 72,
           background: 'var(--surface)',
           borderBottom: '1px solid var(--border)',
@@ -101,7 +111,12 @@ const StudentLayout = () => {
           top: 0,
           zIndex: 40,
         }}>
-          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Student Portal</h2>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+            <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>Student Portal</h2>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 {photo ? (
@@ -111,7 +126,7 @@ const StudentLayout = () => {
                     {studentName[0]}
                 </div>
                 )}
-                <div style={{ textAlign: 'right' }}>
+                <div className="profile-text-desktop" style={{ textAlign: 'right' }}>
                 <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700 }}>{studentName}</p>
                 <p style={{ margin: 0, fontSize: '0.7rem', color: 'var(--text-muted)' }}>{studentId}</p>
                 </div>

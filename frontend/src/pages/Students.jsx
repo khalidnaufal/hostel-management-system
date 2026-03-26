@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import StudentModal from '../components/StudentModal';
+import Skeleton from '../components/Skeleton';
 import { Plus, Trash2, Home } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const Students = () => {
+    const { searchQuery } = useAuth();
     const [students, setStudents] = useState([]);
     const [rooms, setRooms] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
@@ -14,11 +18,14 @@ const Students = () => {
     }, []);
 
     const fetchStudents = async () => {
+        setLoading(true);
         try {
             const { data } = await api.get('/students');
             setStudents(data);
         } catch (error) {
             console.error('Error fetching students:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -84,10 +91,34 @@ const Students = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {students.length === 0 ? (
-                            <tr><td colSpan="6" style={{ textAlign: 'center', padding: '32px' }}>No students found</td></tr>
+                        {loading ? (
+                            Array(5).fill(0).map((_, i) => (
+                                <tr key={i}>
+                                    <td><Skeleton width="120px" height="18px" /></td>
+                                    <td><Skeleton width="80px" height="24px" borderRadius="8px" /></td>
+                                    <td><Skeleton width="100px" height="24px" borderRadius="8px" /></td>
+                                    <td><Skeleton width="140px" height="18px" /></td>
+                                    <td><Skeleton width="100px" height="18px" /></td>
+                                    <td><Skeleton width="120px" height="32px" borderRadius="8px" /></td>
+                                    <td><Skeleton width="32px" height="32px" borderRadius="8px" /></td>
+                                </tr>
+                            ))
+                        ) : students.filter(s => 
+                            !searchQuery || 
+                            s.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            s.student_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            s.phone?.includes(searchQuery)
+                        ).length === 0 ? (
+                            <tr><td colSpan="7" style={{ textAlign: 'center', padding: '32px' }}>No matching students found</td></tr>
                         ) : (
-                            students.map(student => (
+                            students
+                                .filter(s => 
+                                    !searchQuery || 
+                                    s.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    s.student_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    s.phone?.includes(searchQuery)
+                                )
+                                .map(student => (
                                 <tr key={student.id}>
                                     <td style={{ fontWeight: 500 }}>{student.full_name}</td>
                                     <td>

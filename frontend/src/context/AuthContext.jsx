@@ -7,6 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [student, setStudent]   = useState(null);
   const [authUser, setAuthUser] = useState(null);
   const [loading, setLoading]   = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [notificationCount, setNotificationCount] = useState(3); // Dummy count for now
 
   // 📝 Debug Logs
   const log = (msg, data = '') => console.log(`[AuthSystem] ${msg}`, data);
@@ -91,7 +93,8 @@ export const AuthProvider = ({ children }) => {
             sleep_time: creds.sleepTime,
             cleanliness: creds.cleanliness,
             study_preference: creds.studyPreference,
-            noise_tolerance: creds.noiseTolerance
+            noise_tolerance: creds.noiseTolerance,
+            room_preference: creds.roomPreference
         }
       }
     });
@@ -119,7 +122,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ student, authUser, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ 
+      student, authUser, loading, signUp, signIn, signOut,
+      searchQuery, setSearchQuery, notificationCount 
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -60,23 +60,10 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'HMS API is running' });
 });
 
-// Global Error Handler for Vercel Debugging
-app.use((err, req, res, next) => {
-    console.error('SERVER ERROR:', err.stack);
-    res.status(500).json({ 
-        message: 'Internal Server Error',
-        error: process.env.NODE_ENV === 'development' ? err.message : 'Check Vercel Logs'
-    });
-});
-
 const PORT = process.env.PORT || 5000;
 
-// Only listen if not running as a serverless function (optional logic for Vercel)
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(PORT, async () => {
-        console.log(`Server running on port ${PORT}`);
-        await syncAllRoomOccupancies();
-    });
-}
-
-module.exports = app;
+app.listen(PORT, async () => {
+    console.log(`Server running on port ${PORT}`);
+    // Auto-sync on server start
+    await syncAllRoomOccupancies();
+});

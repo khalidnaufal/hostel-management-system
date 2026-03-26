@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CreditCard, CheckCircle, Clock, AlertCircle, History, Receipt } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+import Skeleton from '../../components/Skeleton';
 
 const PayFees = () => {
     const { student } = useAuth();
@@ -151,8 +152,8 @@ const PayFees = () => {
                 </div>
             </div>
 
-            <div className="card" style={{ borderRadius: 20, boxShadow: 'var(--shadow-lg)' }}>
-                <div style={{ padding: '24px 32px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="card payment-history-card" style={{ borderRadius: 20, boxShadow: 'var(--shadow-lg)', background: '#fff', overflow: 'hidden' }}>
+                <div className="card-header" style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ background: '#F3F4F6', padding: 10, borderRadius: 12 }}>
                             <History size={20} color="#4B5563" />
@@ -162,8 +163,8 @@ const PayFees = () => {
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{payments.length} Transactions</span>
                 </div>
                 
-                <div style={{ padding: '0 8px' }}>
-                    <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
+                <div className="table-container" style={{ padding: '0 8px', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'separate', borderSpacing: '0 8px' }}>
                         <thead>
                             <tr style={{ textAlign: 'left', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                                 <th style={{ padding: '12px 24px' }}>TRANSACTION ID</th>
@@ -175,11 +176,22 @@ const PayFees = () => {
                         </thead>
                         <tbody>
                             {loading ? (
-                                <tr>
-                                    <td colSpan="5" style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>Loading history...</td>
-                                </tr>
+                                Array(3).fill(0).map((_, i) => (
+                                    <tr key={i} className="payment-row" style={{ background: '#fff' }}>
+                                        <td style={{ padding: '16px 24px' }}><Skeleton width="120px" height="18px" /></td>
+                                        <td style={{ padding: '16px 24px' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                                <Skeleton width="100px" height="16px" />
+                                                <Skeleton width="80px" height="12px" />
+                                            </div>
+                                        </td>
+                                        <td style={{ padding: '16px 24px' }}><Skeleton width="80px" height="20px" /></td>
+                                        <td style={{ padding: '16px 24px' }}><Skeleton width="70px" height="24px" borderRadius="100px" /></td>
+                                        <td style={{ padding: '16px 24px' }}><Skeleton width="60px" height="28px" borderRadius="8px" /></td>
+                                    </tr>
+                                ))
                             ) : payments.length === 0 ? (
-                                <tr>
+                                <tr className="empty-row">
                                     <td colSpan="5" style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>No payment history found.</td>
                                 </tr>
                             ) : payments.map((p) => (
@@ -247,6 +259,79 @@ const PayFees = () => {
                 .badge.warning {
                     background: #FEF3C7;
                     color: #92400E;
+                }
+
+                @media (max-width: 768px) {
+                    .table-container {
+                        border: none !important;
+                        box-shadow: none !important;
+                        padding: 0 !important;
+                    }
+                    .table-container table {
+                        min-width: 100% !important;
+                    }
+                    .table-container thead {
+                        display: none;
+                    }
+                    .table-container tbody {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 12px;
+                        padding: 16px;
+                    }
+                    .payment-row {
+                        display: grid;
+                        grid-template-columns: 1fr auto;
+                        gap: 8px;
+                        padding: 16px !important;
+                        background: white;
+                        border: 1px solid var(--border);
+                        border-radius: 12px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+                    }
+                    .table-container td:not(.empty-row td) {
+                        display: block;
+                        padding: 0 !important;
+                        border: none !important;
+                    }
+                    .empty-row td {
+                        padding: 32px 16px !important;
+                    }
+                    /* Transaction ID */
+                    .payment-row td:nth-child(1) {
+                        grid-column: 1 / -1;
+                        font-family: monospace;
+                        font-size: 0.8rem;
+                        color: #94A3B8;
+                        margin-bottom: 4px;
+                    }
+                    /* Month / Date */
+                    .payment-row td:nth-child(2) {
+                        grid-column: 1;
+                        grid-row: 2;
+                    }
+                    /* Amount */
+                    .payment-row td:nth-child(3) {
+                        grid-column: 2;
+                        grid-row: 2;
+                        text-align: right;
+                        align-self: center;
+                    }
+                    /* Status Badge */
+                    .payment-row td:nth-child(4) {
+                        grid-column: 1;
+                        grid-row: 3;
+                        margin-top: 8px;
+                    }
+                    /* Action Button */
+                    .payment-row td:nth-child(5) {
+                        grid-column: 2;
+                        grid-row: 3;
+                        text-align: right;
+                        margin-top: 8px;
+                        display: flex;
+                        justify-content: flex-end;
+                    }
                 }
             `}} />
         </div>

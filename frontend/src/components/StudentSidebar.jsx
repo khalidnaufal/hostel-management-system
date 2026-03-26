@@ -2,10 +2,10 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard, BedDouble, CreditCard, Utensils,
-    MessageSquarePlus, Bell, User, LogOut, ArrowRightLeft
+    MessageSquarePlus, Bell, User, LogOut, ArrowRightLeft, X
 } from 'lucide-react';
 
-const StudentSidebar = () => {
+const StudentSidebar = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -26,10 +26,15 @@ const StudentSidebar = () => {
     ];
 
     return (
-        <aside className="sidebar">
-            <div className="sidebar-brand">
-                <h2>HMS<span>Pro</span></h2>
-                <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#6B7280', fontWeight: 500 }}>Student Portal</p>
+        <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+            <div className="sidebar-brand" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <h2>HMS<span>Pro</span></h2>
+                    <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#6B7280', fontWeight: 500 }}>Student Portal</p>
+                </div>
+                <button className="mobile-menu-btn" onClick={onClose} style={{ marginRight: 0 }}>
+                    <X size={24} />
+                </button>
             </div>
 
             <nav className="sidebar-nav">
@@ -37,6 +42,7 @@ const StudentSidebar = () => {
                     <NavLink
                         key={item.to}
                         to={item.to}
+                        onClick={onClose}
                         className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
                     >
                         {item.icon}
@@ -46,7 +52,7 @@ const StudentSidebar = () => {
             </nav>
 
             <div className="sidebar-footer">
-                <button onClick={handleLogout} className="logout-btn">
+                <button onClick={handleLogout} className="logout-btn" style={{ minHeight: '44px' }}>
                     <LogOut size={20} />
                     <span>Logout</span>
                 </button>

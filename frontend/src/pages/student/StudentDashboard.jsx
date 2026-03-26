@@ -3,13 +3,18 @@ import { BedDouble, CreditCard, MessageSquarePlus, Bell, User, Loader2, Info } f
 import { useAuth } from '../../context/AuthContext';
 import Splash from '../../components/Splash';
 import RoommateMatcher from '../../components/RoommateMatcher';
+import Skeleton from '../../components/Skeleton';
 
 
-const StatCard = ({ icon, label, value, color, bg }) => (
+const StatCard = ({ icon, label, value, color, bg, loading }) => (
     <div className="stat-card">
         <div className="stat-content">
             <h3 style={{ fontSize: '0.8rem', color: '#64748B' }}>{label}</h3>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{value}</h2>
+            {loading ? (
+                <Skeleton width="80px" height="24px" borderRadius="6px" />
+            ) : (
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 800 }}>{value}</h2>
+            )}
         </div>
         <div className="stat-icon" style={{ backgroundColor: bg, color }}>
             {icon}
@@ -54,14 +59,14 @@ const StudentDashboard = () => {
             <div className="page-header">
                 <div>
                     <h2 style={{ fontSize: '2rem', fontWeight: 900, marginBottom: 4 }}>
-                        Hello, {firstName}! 👋
+                        {loading ? <Skeleton width="180px" height="32px" /> : `Hello, ${firstName}! 👋`}
                     </h2>
                     <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '1rem' }}>Welcome to your premium student hostel portal.</p>
                 </div>
 
 
                 <div className="badge info" style={{ padding: '8px 16px', fontSize: '0.8rem', fontWeight: 700 }}>
-                    ID: {displayId}
+                    {loading ? <Skeleton width="80px" height="18px" /> : `ID: ${displayId}`}
                 </div>
             </div>
 
@@ -72,6 +77,7 @@ const StudentDashboard = () => {
                     value={displayRoom === 'Not Assigned' ? 'Room TBA' : `Room ${displayRoom}`}
                     color="#4F46E5"
                     bg="#EEF2FF"
+                    loading={loading}
                 />
                 <StatCard
                     icon={<CreditCard size={22} />}
@@ -79,6 +85,7 @@ const StudentDashboard = () => {
                     value={displayFee}
                     color={displayFee === 'Paid' ? '#059669' : '#D97706'}
                     bg={displayFee === 'Paid' ? '#ECFDF5' : '#FFFBEB'}
+                    loading={loading}
                 />
                 <StatCard
                     icon={<MessageSquarePlus size={22} />}
@@ -86,6 +93,7 @@ const StudentDashboard = () => {
                     value="0"
                     color="#DC2626"
                     bg="#FEF2F2"
+                    loading={loading}
                 />
                 <StatCard
                     icon={<Bell size={22} />}
@@ -93,6 +101,7 @@ const StudentDashboard = () => {
                     value="3"
                     color="#D97706"
                     bg="#FFFBEB"
+                    loading={loading}
                 />
             </div>
 
@@ -131,15 +140,25 @@ const StudentDashboard = () => {
                         <User size={18} color="var(--primary)" />
                         <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>Quick Profile</h3>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                        <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
-                            {displayName[0]}
+                    {loading ? (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                            <Skeleton width="44px" height="44px" borderRadius="50%" />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <Skeleton width="120px" height="16px" />
+                                <Skeleton width="80px" height="12px" />
+                            </div>
                         </div>
-                        <div>
-                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700 }}>{displayName}</p>
-                            <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>{student?.course || authUser?.email || 'Student Account'}</p>
+                    ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                            <div style={{ width: 44, height: 44, background: 'linear-gradient(135deg, #4F46E5, #7C3AED)', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>
+                                {displayName[0]}
+                            </div>
+                            <div>
+                                <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 700 }}>{displayName}</p>
+                                <p style={{ margin: 0, fontSize: '0.75rem', color: '#64748B' }}>{student?.course || authUser?.email || 'Student Account'}</p>
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

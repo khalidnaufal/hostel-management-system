@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { CheckCircle, Clock, User } from 'lucide-react';
+import Skeleton from '../components/Skeleton';
 
 const Complaints = () => {
     const [complaints, setComplaints] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchComplaints();
     }, []);
 
     const fetchComplaints = async () => {
+        setLoading(true);
         try {
             const { data } = await api.get('/complaints');
             setComplaints(data);
         } catch (error) {
             console.error('Error fetching complaints:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -49,7 +53,22 @@ const Complaints = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {complaints.length === 0 ? (
+                        {loading ? (
+                            Array(4).fill(0).map((_, i) => (
+                                <tr key={i}>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                            <Skeleton width="32px" height="32px" borderRadius="50%" />
+                                            <Skeleton width="80px" height="20px" borderRadius="6px" />
+                                        </div>
+                                    </td>
+                                    <td><Skeleton width="300px" height="18px" /></td>
+                                    <td><Skeleton width="100px" height="18px" /></td>
+                                    <td><Skeleton width="80px" height="24px" borderRadius="12px" /></td>
+                                    <td><Skeleton width="100px" height="32px" borderRadius="8px" /></td>
+                                </tr>
+                            ))
+                        ) : complaints.length === 0 ? (
                             <tr><td colSpan="5" style={{ textAlign: 'center', padding: '32px' }}>No complaints found</td></tr>
                         ) : (
                             complaints.map(complaint => (

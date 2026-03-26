@@ -20,7 +20,8 @@ const StudentSignup = () => {
         sleepTime: '',
         cleanliness: '',
         studyPreference: '',
-        noiseTolerance: ''
+        noiseTolerance: '',
+        roomPreference: ''
     });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -60,7 +61,8 @@ const StudentSignup = () => {
                 sleepTime: form.sleepTime,
                 cleanliness: form.cleanliness,
                 studyPreference: form.studyPreference,
-                noiseTolerance: form.noiseTolerance
+                noiseTolerance: form.noiseTolerance,
+                roomPreference: form.roomPreference
             };
 
             const { user } = await signUp(signupData);
@@ -247,6 +249,28 @@ const StudentSignup = () => {
                                 >
                                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
+                            </div>
+                        </div>
+
+                        <div className="form-section-divider">
+                            <span>Room Preference</span>
+                        </div>
+
+                        <div className="form-group-full">
+                            <label>Preferred Room Sharing 🏢</label>
+                            <div className="input-wrapper">
+                                <select 
+                                    name="roomPreference" 
+                                    value={form.roomPreference} 
+                                    onChange={handleChange} 
+                                    className="premium-select"
+                                    required
+                                >
+                                    <option value="" disabled>Select your preferred sharing</option>
+                                    <option value="1 Sharing">1 Sharing (Single Room) 👑</option>
+                                    <option value="2 Sharing">2 Sharing (Double Room) 🤝</option>
+                                    <option value="4 Sharing">4 Sharing (Quad Room) 👨‍👨‍👦‍👦</option>
+                                </select>
                             </div>
                         </div>
 

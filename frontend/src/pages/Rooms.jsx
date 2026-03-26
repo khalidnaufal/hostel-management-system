@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Plus, Trash2 } from 'lucide-react';
 import RoomModal from '../components/RoomModal';
+import Skeleton from '../components/Skeleton';
+import { useAuth } from '../context/AuthContext';
 
 const Rooms = () => {
+    const { searchQuery } = useAuth();
     const [rooms, setRooms] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
@@ -12,11 +16,14 @@ const Rooms = () => {
     }, []);
 
     const fetchRooms = async () => {
+        setLoading(true);
         try {
             const { data } = await api.get('/rooms');
             setRooms(data);
         } catch (error) {
             console.error('Error fetching rooms:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -62,10 +69,22 @@ const Rooms = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {rooms.length === 0 ? (
-                            <tr><td colSpan="5" style={{ textAlign: 'center', padding: '32px' }}>No rooms found</td></tr>
+                        {loading ? (
+                            Array(5).fill(0).map((_, i) => (
+                                <tr key={i}>
+                                    <td><Skeleton width="100px" height="18px" /></td>
+                                    <td><Skeleton width="40px" height="18px" /></td>
+                                    <td><Skeleton width="40px" height="18px" /></td>
+                                    <td><Skeleton width="80px" height="24px" borderRadius="12px" /></td>
+                                    <td><Skeleton width="32px" height="32px" borderRadius="8px" /></td>
+                                </tr>
+                            ))
+                        ) : rooms.filter(r => !searchQuery || r.room_number?.toString().includes(searchQuery)).length === 0 ? (
+                            <tr><td colSpan="5" style={{ textAlign: 'center', padding: '32px' }}>No matching rooms found</td></tr>
                         ) : (
-                            rooms.map(room => (
+                            rooms
+                                .filter(r => !searchQuery || r.room_number?.toString().includes(searchQuery))
+                                .map(room => (
                                 <tr key={room.id}>
                                     <td style={{ fontWeight: 500 }}>{room.room_number}</td>
                                     <td>{room.capacity}</td>

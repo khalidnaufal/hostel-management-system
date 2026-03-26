@@ -38,7 +38,7 @@ const MyProfile = () => {
     useEffect(() => {
         if (student) {
             setDraft(student);
-            if (student.avatar_url) setPhoto(student.avatar_url);
+            setPhoto(student.avatar_url || localStorage.getItem(`studentPhoto_${student.student_id}`));
         } else if (authUser?.user_metadata) {
             setDraft({
                 full_name: authUser.user_metadata.full_name,
@@ -57,6 +57,11 @@ const MyProfile = () => {
         reader.onload = async (e) => {
             const dataUrl = e.target.result;
             setPhoto(dataUrl);
+            
+            // ⚡ CACHE: Scope to this specific student ID
+            if (student?.student_id) {
+                localStorage.setItem(`studentPhoto_${student.student_id}`, dataUrl);
+            }
             
             try {
                 const { error } = await supabase

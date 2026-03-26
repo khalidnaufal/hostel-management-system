@@ -23,6 +23,7 @@ const Login = () => {
         setError('');
         if (identifier === 'user123' && password === 'impelsys@123') {
             localStorage.setItem('isAuthenticated', 'true');
+            localStorage.removeItem('isStudentAuthenticated'); // ⚡ CLEAR Student Session
             navigate('/dashboard');
         } else {
             setError('Invalid admin credentials');
@@ -40,7 +41,8 @@ const Login = () => {
         try {
             await signIn({ email: identifier.trim(), password: password.trim() });
             localStorage.setItem('isStudentAuthenticated', 'true');
-            sessionStorage.removeItem('splashShown'); // ⚡ Force splash on next mount
+            localStorage.removeItem('isAuthenticated'); // ⚡ CLEAR Admin Session
+            sessionStorage.removeItem('splashShown'); 
             navigate('/student/dashboard');
 
         } catch (err) {

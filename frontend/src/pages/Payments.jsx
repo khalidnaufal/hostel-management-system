@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { Plus, X, Loader2, CreditCard, Search, Calendar, ChevronRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import Skeleton from '../components/Skeleton';
 import './Payments.css';
 
 const Payments = () => {
+    const { searchQuery } = useAuth();
     const [payments, setPayments] = useState([]);
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -74,39 +77,72 @@ const Payments = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {payments.length === 0 ? (
-                            <tr><td colSpan="5" className="empty-row text-center">No transactions recorded</td></tr>
-                        ) : (
-                            payments.map(px => (
-                                <tr key={px.id}>
+                        {loading ? (
+                            Array(5).fill(0).map((_, i) => (
+                                <tr key={i}>
                                     <td>
-                                        <div className="student-info">
-                                            <span className="name">{px.students?.full_name || 'N/A'}</span>
-                                            <span className="id">ID: {px.student_id?.slice(0, 8)}</span>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                            <Skeleton width="120px" height="16px" />
+                                            <Skeleton width="80px" height="12px" />
                                         </div>
                                     </td>
-                                    <td>
-                                        <div className="amount-box">
-                                            <span className="currency">₹</span>
-                                            <span className="amount">{px.amount}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="date-box">
-                                            <Calendar size={14} />
-                                            <span>{new Date(px.created_at).toLocaleDateString()}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className="note-text">{px.note || (px.razorpay_order_id === 'manual' ? 'Offline Cash' : 'Online razorpay')}</span>
-                                    </td>
-                                    <td>
-                                        <span className={`badge ${px.status === 'Paid' ? 'success' : 'danger'}`}>
-                                            {px.status}
-                                        </span>
-                                    </td>
+                                    <td><Skeleton width="100px" height="20px" /></td>
+                                    <td><Skeleton width="110px" height="18px" /></td>
+                                    <td><Skeleton width="150px" height="16px" /></td>
+                                    <td><Skeleton width="80px" height="24px" borderRadius="12px" /></td>
                                 </tr>
                             ))
+                        ) : (
+                            payments.filter(p => {
+                                if (!searchQuery) return true;
+                                const student = students.find(s => s.student_id === p.student_id);
+                                return (
+                                    p.student_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                    student?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+                                );
+                            }).length === 0 ? (
+                                <tr><td colSpan="5" className="no-data">No matching payments found</td></tr>
+                            ) : (
+                                payments
+                                    .filter(p => {
+                                        if (!searchQuery) return true;
+                                        const student = students.find(s => s.student_id === p.student_id);
+                                        return (
+                                            p.student_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                            student?.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+                                        );
+                                    })
+                                    .map(payment => (
+                                        <tr key={payment.id}>
+                                            <td>
+                                                <div className="student-info">
+                                                    <span className="name">{payment.students?.full_name || 'N/A'}</span>
+                                                    <span className="id">ID: {payment.student_id?.slice(0, 8)}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="amount-box">
+                                                    <span className="currency">₹</span>
+                                                    <span className="amount">{payment.amount}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="date-box">
+                                                    <Calendar size={14} />
+                                                    <span>{new Date(payment.created_at).toLocaleDateString()}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span className="note-text">{payment.note || (payment.razorpay_order_id === 'manual' ? 'Offline Cash' : 'Online razorpay')}</span>
+                                            </td>
+                                            <td>
+                                                <span className={`badge ${payment.status === 'Paid' ? 'success' : 'danger'}`}>
+                                                    {payment.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                            )
                         )}
                     </tbody>
                 </table>

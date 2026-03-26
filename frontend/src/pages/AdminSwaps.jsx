@@ -4,6 +4,7 @@ import {
     History, Search, Filter, Loader2, AlertCircle
 } from 'lucide-react';
 import api from '../services/api';
+import Skeleton from '../components/Skeleton';
 import './AdminSwaps.css';
 
 const AdminSwaps = () => {
@@ -78,8 +79,6 @@ const AdminSwaps = () => {
         }
     };
 
-    if (loading) return <div className="admin-loader"><Loader2 className="spin" /></div>;
-
     return (
         <div className="admin-page animate-in">
             <div className="admin-header">
@@ -131,7 +130,28 @@ const AdminSwaps = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredRequests.length === 0 ? (
+                        {loading ? (
+                            Array(4).fill(0).map((_, i) => (
+                                <tr key={i}>
+                                    <td>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                            <Skeleton width="100px" height="16px" />
+                                            <ArrowRightLeft size={12} style={{ color: '#CBD5E1' }} />
+                                            <Skeleton width="100px" height="16px" />
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style={{ display: 'flex', gap: 8 }}>
+                                            <Skeleton width="40px" height="18px" borderRadius="4px" />
+                                            <Skeleton width="40px" height="18px" borderRadius="4px" />
+                                        </div>
+                                    </td>
+                                    <td><Skeleton width="100px" height="16px" /></td>
+                                    <td><Skeleton width="120px" height="24px" borderRadius="12px" /></td>
+                                    <td><Skeleton width="100px" height="32px" borderRadius="8px" /></td>
+                                </tr>
+                            ))
+                        ) : filteredRequests.length === 0 ? (
                             <tr>
                                 <td colSpan="5" className="empty-row">No requests found matching your criteria.</td>
                             </tr>
