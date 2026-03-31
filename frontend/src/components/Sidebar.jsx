@@ -1,9 +1,16 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, Users, BedDouble, AlertCircle, CreditCard, LogOut, ArrowRightLeft, X } from 'lucide-react';
+import LogoutModal from './LogoutModal';
 
 const Sidebar = ({ isOpen, onClose }) => {
-    const handleLogout = () => {
+    const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+
+    const handleLogoutClick = () => {
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
         localStorage.removeItem('isAuthenticated');
         window.location.href = '/login';
     };
@@ -45,11 +52,17 @@ const Sidebar = ({ isOpen, onClose }) => {
             </nav>
 
             <div className="sidebar-footer">
-                <button onClick={handleLogout} className="logout-btn" style={{ minHeight: '44px' }}>
+                <button onClick={handleLogoutClick} className="logout-btn" style={{ minHeight: '44px' }}>
                     <LogOut size={20} />
                     <span>Logout</span>
                 </button>
             </div>
+
+            <LogoutModal 
+                isOpen={showLogoutModal} 
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={confirmLogout}
+            />
         </aside>
     );
 };

@@ -4,11 +4,17 @@ import {
     LayoutDashboard, BedDouble, CreditCard, Utensils,
     MessageSquarePlus, Bell, User, LogOut, ArrowRightLeft, X
 } from 'lucide-react';
+import LogoutModal from './LogoutModal';
 
 const StudentSidebar = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
+    const [showLogoutModal, setShowLogoutModal] = React.useState(false);
 
-    const handleLogout = () => {
+    const handleLogoutClick = () => {
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
         localStorage.removeItem('isStudentAuthenticated');
         localStorage.removeItem('studentPhoto'); // Clear photo too if needed
         navigate('/login');
@@ -52,11 +58,17 @@ const StudentSidebar = ({ isOpen, onClose }) => {
             </nav>
 
             <div className="sidebar-footer">
-                <button onClick={handleLogout} className="logout-btn" style={{ minHeight: '44px' }}>
+                <button onClick={handleLogoutClick} className="logout-btn" style={{ minHeight: '44px' }}>
                     <LogOut size={20} />
                     <span>Logout</span>
                 </button>
             </div>
+
+            <LogoutModal 
+                isOpen={showLogoutModal} 
+                onClose={() => setShowLogoutModal(false)}
+                onConfirm={confirmLogout}
+            />
         </aside>
     );
 };
