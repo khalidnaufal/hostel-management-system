@@ -590,6 +590,102 @@ tbody tr:last-child td {
   font-weight: 500;
 }
 
+/* New Dashboard UI Enhancements */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  margin: 32px 0 40px 0;
+}
+
+.highlighted-section {
+  background: linear-gradient(135deg, rgba(238, 240, 255, 0.6), rgba(248, 250, 255, 0.6));
+  border: 1px solid transparent;
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  margin: 32px 0;
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.highlighted-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--primary-gradient);
+}
+
+.highlighted-section:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.recent-activity {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-light);
+  transition: var(--transition);
+}
+
+.activity-item:hover {
+  background: var(--surface-2);
+  padding-left: 8px;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: white;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.status-badge.due-soon {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.status-badge.paid {
+  background: #D1FAE5;
+  color: #047857;
+}
+
+.status-badge.no-open {
+  background: #F1F5F9;
+  color: #475569;
+}
+
 /* ---------- MOBILE RESPONSIVE LAYOUT ---------- */
 
 /* Mobile Sidebar & Layout Breakpoints */
