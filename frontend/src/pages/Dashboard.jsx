@@ -405,7 +405,7 @@ const Dashboard = () => {
                                 iconBg={item.iconBg}
                                 text={item.text}
                                 time={item.time}
-                                isLast={i === activityToShow.length - 1 || i === activityToShow.length - 2}
+                                isLast={i === activityToShow.length - 1}
                             />
                         ))}
                     </div>
