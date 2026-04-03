@@ -16,8 +16,12 @@ const app = express();
 // Body parser
 app.use(express.json());
 
-// Enable CORS
-app.use(cors());
+// Enable CORS with more explicit settings for Vercel
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
 // Mount routers
 app.use('/api/students', studentRoutes);
@@ -57,13 +61,23 @@ app.get('/api/sync-occupancy', async (req, res) => {
 
 // Health check for deployment
 app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', message: 'HMS API is running' });
+    res.json({ 
+        status: 'ok', 
+        message: 'HMS API is running',
+        timestamp: new Date().toISOString()
+    });
 });
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, async () => {
-    console.log(`Server running on port ${PORT}`);
-    // Auto-sync on server start
-    await syncAllRoomOccupancies();
-});
+// Export for Vercel
+module.exports = app;
+
+// Listen only when local
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, async () => {
+        console.log(`Server running on port ${PORT}`);
+        // Auto-sync on server start
+        await syncAllRoomOccupancies();
+    });
+}
