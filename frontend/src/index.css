@@ -863,6 +863,12 @@ tbody tr:last-child td {
   background: var(--background);
 }
 
+/* --- Global Defaults for Mobile Components --- */
+.complaints-mobile-grid,
+.show-on-mobile {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: flex !important;
@@ -872,7 +878,7 @@ tbody tr:last-child td {
 
   /* --- Complaint Specific Mobile Fixes --- */
   .complaints-mobile-grid {
-    display: none;
+    display: none !important; /* overridden by .active below but let's reset to flex */
     flex-direction: column;
     gap: 16px;
     padding-top: 10px;
@@ -887,7 +893,7 @@ tbody tr:last-child td {
   }
   
   .complaints-mobile-grid.active {
-     display: flex;
+     display: flex !important;
   }
 
   .complaint-card {
