@@ -51,7 +51,7 @@ const Payments = () => {
         }
     };
 
-    if (loading) return <div className="loader"><Loader2 className="spin" /></div>;
+
 
     return (
         <div className="page animate-in">
