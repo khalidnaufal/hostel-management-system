@@ -8,14 +8,14 @@ import './Login.css';
 const Login = () => {
     const [activeTab,    setActiveTab]    = useState('admin');
     const [identifier,   setIdentifier]   = useState('');   // email or username
-    const [password,     setPassword]     = useState('impelsys@123');
+    const [password,     setPassword]     = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error,        setError]        = useState('');
     const [loading,      setLoading]      = useState(false);
     const navigate  = useNavigate();
     const { signIn } = useAuth();
 
-    const resetForm = () => { setIdentifier(''); setPassword('impelsys@123'); setError(''); setLoading(false); };
+    const resetForm = () => { setIdentifier(''); setPassword(''); setError(''); setLoading(false); };
 
     /* ─── Admin login (static/hardcoded for now) ──────────────────── */
     const handleAdminLogin = (e) => {
